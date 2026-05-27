@@ -22,9 +22,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Molengo&display=swap" rel="stylesheet" />
 
-    <link rel="preload" as="image" href="assets/images/seccion2_1.jpg" />
-    <link rel="preload" as="image" href="assets/images/seccion2_2.jpg" />
-    <link rel="preload" as="image" href="assets/images/seccion2_3.jpg" />
+    <link rel="preload" as="image" href="assets/images/seccion2_1.webp" />
+    <link rel="preload" as="image" href="assets/images/seccion2_2.webp" />
+    <link rel="preload" as="image" href="assets/images/seccion2_3.webp" />
 
     <!-- Configuración de Tailwind -->
     <script>
@@ -232,7 +232,11 @@
               <!-- Rectángulo GRANDE -->
               <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
                 <!-- Imagen -->
-                <img src="assets/images/seccion2_1.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+                <img
+                  src="assets/images/seccion2_1.webp"
+                  loading="eager"
+                  decoding="async"
+                  class="absolute top-0 left-0 w-full h-full object-cover" />
 
                 <!-- Capa oscura (normal invisible, hover visible) -->
                 <div
@@ -270,13 +274,21 @@
             <div class="flex flex-col gap-2">
               <!-- Rectángulo PEQUEÑO (solo imagen) -->
               <div class="opacity-0 aspect-[482/331] relative overflow-hidden mx-auto my-0">
-                <img src="assets/images/seccion2_2_2.webp" class="w-full h-full object-cover" />
+                <img
+                  src="assets/images/seccion2_2_2.webp"
+                  loading="eager"
+                  decoding="async"
+                  class="w-full h-full object-cover" />
               </div>
 
               <!-- Rectángulo GRANDE con texto CENTRADO -->
               <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
                 <!-- Imagen -->
-                <img src="assets/images/seccion2_2.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+                <img
+                  src="assets/images/seccion2_2.webp"
+                  loading="eager"
+                  decoding="async"
+                  class="absolute top-0 left-0 w-full h-full object-cover" />
 
                 <!-- Capa oscura (normal invisible, hover visible) -->
                 <div
@@ -312,7 +324,11 @@
               <!-- Rectángulo GRANDE con texto CENTRADO -->
               <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
                 <!-- Imagen -->
-                <img src="assets/images/seccion2_3.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+                <img
+                  src="assets/images/seccion2_3.webp"
+                  loading="eager"
+                  decoding="async"
+                  class="absolute top-0 left-0 w-full h-full object-cover" />
 
                 <!-- Capa oscura (normal invisible, hover visible) -->
                 <div

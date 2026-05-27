@@ -110,36 +110,48 @@ if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMobileMenu);
 document.querySelectorAll(".mobile-nav-link").forEach((link) => link.addEventListener("click", closeMobileMenu));
 
 // ============================================================
-// 5. ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER
+// 5. ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER (Sincronización estricta)
 // ============================================================
 gsap.registerPlugin(ScrollTrigger);
 
-// ========== ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER (optimizada) ==========
 const cardsContainer = document.querySelector(".grid");
-if (cardsContainer) {
-  const cards = document.querySelectorAll(".flex.flex-col.gap-2");
-  if (cards.length) {
-    // Estado inicial (solo opacidad, sin transformaciones pesadas)
-    gsap.set(cards, { opacity: 0, y: 30 });
+const cards = document.querySelectorAll(".flex.flex-col.gap-2");
 
-    // Animación con ScrollTrigger más ligera
+if (cardsContainer && cards.length) {
+  // 1. Ocultamos las tarjetas inmediatamente con GSAP para evitar parpadeos
+  gsap.set(cards, { opacity: 0, y: 30 });
+
+  // 2. Seleccionamos solo las imágenes dentro de las tarjetas asimétricas
+  const bentoImages = Array.from(cardsContainer.querySelectorAll("img"));
+
+  // 3. Forzamos a la GPU a decodificarlas en bloque ANTES de crear el ScrollTrigger
+  Promise.all(
+    bentoImages.map((img) => {
+      // img.decode() es una API moderna que procesa la imagen de forma asíncrona
+      // y resuelve la promesa solo cuando está 100% lista para ser pintada al instante.
+      return img.decode().catch(() => {
+        // Capturamos cualquier error silencioso para que la animación no se rompa
+        console.warn("Una imagen del grid tardó en decodificarse");
+      });
+    }),
+  ).then(() => {
+    // 4. UNA VEZ TODAS ESTÁN LISTAS, inicializamos la animación
     gsap.to(cards, {
       scrollTrigger: {
         trigger: cardsContainer,
-        start: "top 90%", // Se activa un poco más tarde (antes 85%)
+        start: "top 80%",
         once: true,
         toggleActions: "play none none none",
-        // Evita que ScrollTrigger haga cálculos extra
         invalidateOnRefresh: false,
         markers: false,
       },
       opacity: 1,
       y: 0,
-      duration: 0.6,
+      duration: 1,
       ease: "power2.out",
-      stagger: 0.1,
+      // Sin stagger, para que las 3 entren en el mismo milisegundo exacto
     });
-  }
+  });
 }
 
 console.log("✅ animations.js cargado y loader integrado");

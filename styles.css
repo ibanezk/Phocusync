@@ -16,7 +16,12 @@ main {
   will-change: transform;
 }
 
-img {
+.bento-card {
+  will-change: transform, opacity;
+  transform: translateZ(0); /* Hack legendario para forzar la aceleración 3D */
+}
+
+img:not(.group img) {
   content-visibility: auto;
 }
 
