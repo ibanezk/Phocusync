@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap");
+
+@font-face {
+  font-family: "Mango_Grotesque";
+  src: url("assets/fonts/MangoGrotesque-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+}
+
+.grid {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+main {
+  will-change: transform;
+}
+
+img {
+  content-visibility: auto;
+}
+
+/* Loader spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-on-load,
+.frame,
+#heroTitle,
+#imageContainer {
+  will-change: transform, opacity;
+}
+
+#contactBtn {
+  white-space: nowrap !important;
+}
+
+.bg-hero-gradient {
+  background: linear-gradient(125deg, #1a3a2a, #0a1a2a);
+}
+
+.text-brand-orange {
+  color: #ff4d00;
+}
+
+.bg-hero-gradient {
+  background: linear-gradient(90deg, #1a3a1c, #0f2a0a);
+}
+
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.frame {
+  will-change: transform;
+}
+
+.animate-on-load {
+  opacity: 0;
+}
+
+/* Ocultar botón hamburguesa cuando el menú está abierto */
+body.menu-open #menuBtn {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Asegurar que la X esté por encima de todo */
+#closeMenuBtn {
+  z-index: 100;
+  position: absolute;
+  cursor: pointer;
+}
+
+#menuBtn {
+  transition: opacity 0.3s ease;
+  z-index: 30;
+}
+
+/* ========== SECCIÓN DE TARJETAS ========== */
+/* Optimizar transiciones en tarjetas (solo propiedades necesarias) */
+
+.border-brand-orange,
+.group img,
+.group .absolute {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+/* Evitar que el hover recalcule layout */
+.group {
+  will-change: transform;
+}
+
+/* FORZAR MENÚ HORIZONTAL */
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .desktop-nav > div:last-child,
+  .desktop-nav .flex.items-center {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 2rem !important;
+  }
+
+  .desktop-nav a {
+    display: inline-block !important;
+  }
+
+  .nav-item,
+  #contactBtn {
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-nav {
+    display: none !important;
+  }
+}
+
+/* Ocultar solo en móvil */
+@media (min-width: 769px) {
+  .mobile-nav {
+    display: none !important;
+  }
+  .desktop-nav {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-nav {
+    display: block !important;
+  }
+}
+
+/* Asegurar que nada se rompa */
+@media (min-width: 769px) {
+  .desktop-nav {
+    flex-direction: row !important;
+  }
+}

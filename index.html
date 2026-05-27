@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>PhocuSync</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+    <!-- Estilos y animaciones -->
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="script.js" defer></script>
+
+    <!-- Google Fonts: Molengo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Molengo&display=swap" rel="stylesheet" />
+
+    <link rel="preload" as="image" href="assets/images/seccion2_1.jpg" />
+    <link rel="preload" as="image" href="assets/images/seccion2_2.jpg" />
+    <link rel="preload" as="image" href="assets/images/seccion2_3.jpg" />
+
+    <!-- Configuración de Tailwind -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "brand-orange": "#FF4D00",
+            },
+            fontFamily: {
+              custom: ["Mango_Grotesque"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="m-0 p-0 overflow-x-hidden">
+    <div
+      id="page-loader"
+      class="fixed inset-0 bg-black z-50 flex items-center justify-center transition-opacity duration-500">
+      <div class="text-center">
+        <div
+          class="w-12 h-12 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-brand-orange font-custom text-lg">Cargando experiencia...</p>
+      </div>
+    </div>
+
+    <main class="relative w-full min-h-screen bg-hero-gradient flex flex-col">
+      <!-- MENÚ -->
+      <div class="w-full pt-6 md:pt-8 animate-on-load" id="menuContainer">
+        <div class="max-w-[1440px] w-full mx-auto px-6 md:px-12 lg:px-20">
+          <!-- Menú escritorio - VERSIÓN SIMPLIFICADA -->
+          <nav
+            class="desktop-nav mb-6 md:mb-2"
+            style="display: flex; justify-content: space-between; align-items: center; width: 100%">
+            <div style="display: flex; align-items: center; gap: 0.5rem">
+              <div class="w-7 h-7" id="logoIcon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <path
+                    d="M4 14.5C7 11 9 8 14 8C19 8 21 11 24 14.5"
+                    stroke="#FF4D00"
+                    stroke-width="2.2"
+                    stroke-linecap="round" />
+                  <path
+                    d="M4 20C7.5 16.2 10 14 14 14C18 14 20.5 16.5 24 20"
+                    stroke="#FF4D00"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-opacity="0.7" />
+                  <path
+                    d="M6 8.5C8.5 5.5 11 4 14 4C17 4 19.5 6 22 8.5"
+                    stroke="#FF4D00"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-opacity="0.5" />
+                </svg>
+              </div>
+              <span class="text-white text-xl font-semibold">Phocu<span class="text-brand-orange">Sync</span></span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 2rem">
+              <a href="#" class="text-brand-orange nav-item">Inicio</a>
+              <a href="#" class="text-brand-orange nav-item">Cómo funciona</a>
+              <a href="#" class="text-brand-orange nav-item">Beneficios</a>
+              <a href="#" class="text-brand-orange nav-item">Planes</a>
+              <a href="#" class="text-white hover:text-brand-orange text-sm font-medium nav-item">Ingresar</a>
+              <a href="#" class="border border-brand-orange text-brand-orange px-5 py-2 rounded-full" id="contactBtn"
+                >Pruebalo Gratis</a
+              >
+            </div>
+          </nav>
+
+          <!-- Menú móvil (solo botón hamburguesa) -->
+          <div class="mobile-nav w-full">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <path
+                      d="M4 14.5C7 11 9 8 14 8C19 8 21 11 24 14.5"
+                      stroke="#FF4D00"
+                      stroke-width="2.2"
+                      stroke-linecap="round" />
+                    <path
+                      d="M4 20C7.5 16.2 10 14 14 14C18 14 20.5 16.5 24 20"
+                      stroke="#FF4D00"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-opacity="0.7" />
+                    <path
+                      d="M6 8.5C8.5 5.5 11 4 14 4C17 4 19.5 6 22 8.5"
+                      stroke="#FF4D00"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-opacity="0.5" />
+                  </svg>
+                </div>
+                <span class="text-white text-xl font-semibold tracking-tight"
+                  >Phocu<span class="text-brand-orange">Sync</span></span
+                >
+              </div>
+
+              <button
+                id="menuBtn"
+                class="w-8 h-8 flex flex-col justify-center items-center gap-1.5 cursor-pointer relative z-30">
+                <span class="w-6 h-0.5 bg-brand-orange rounded-full"></span>
+                <span class="w-6 h-0.5 bg-brand-orange rounded-full"></span>
+                <span class="w-6 h-0.5 bg-brand-orange rounded-full"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menú desplegable móvil -->
+      <div
+        id="mobileMenu"
+        class="fixed top-0 left-0 w-full h-screen bg-[#0d1a1f] z-20"
+        style="visibility: hidden; opacity: 0; display: none">
+        <div class="mobile-menu-content w-full h-screen flex flex-col justify-center items-center gap-8 relative">
+          <button id="closeMenuBtn" class="absolute top-6 right-6 text-brand-orange text-3xl">✕</button>
+          <a href="#" class="text-brand-orange text-2xl font-medium mobile-nav-link">Inicio</a>
+          <a href="#" class="text-brand-orange text-2xl font-medium mobile-nav-link">Cómo funciona</a>
+          <a href="#" class="text-brand-orange text-2xl font-medium mobile-nav-link">Beneficios</a>
+          <a href="#" class="text-brand-orange text-2xl font-medium mobile-nav-link">Planes</a>
+          <a href="#" class="text-white text-2xl font-medium mobile-nav-link">Ingresar</a>
+          <a
+            href="#"
+            class="border border-brand-orange text-brand-orange px-8 py-3 rounded-full text-lg font-medium mobile-nav-link"
+            >Pruébalo Gratis</a
+          >
+        </div>
+      </div>
+
+      <!-- CONTENIDO PRINCIPAL -->
+      <div class="flex items-start min-h-screen pt-20 md:pt-24">
+        <div class="max-w-[1440px] w-full mx-auto px-6 md:px-12 lg:px-20">
+          <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+            <!-- IMAGEN -->
+            <div
+              class="flex-1 relative flex justify-center order-first md:order-last animate-on-load"
+              id="imageContainer">
+              <div class="relative w-full max-w-[180px] lg:max-w-[220px] xl:max-w-[260px] z-10">
+                <div
+                  class="absolute w-[115%] h-[115%] border-2 border-brand-orange/50 z-20 hidden sm:block frame frame-1"
+                  style="bottom: 0; left: 0"></div>
+                <div
+                  class="absolute w-[115%] h-[115%] border-2 border-brand-orange/40 z-20 hidden sm:block frame frame-2"
+                  style="top: 50%; left: 50%; transform: translate(-50%, -50%)"></div>
+                <div
+                  class="absolute w-[115%] h-[115%] border border-brand-orange/35 z-20 hidden sm:block frame frame-3"
+                  style="top: 0; right: 0"></div>
+
+                <div class="w-64 h-80 overflow-hidden bg-gray-100 relative z-10" id="photo">
+                  <img
+                    src="assets/images/hero.webp"
+                    alt="Retrato elegante"
+                    class="w-full h-auto object-cover block shadow-2xl" />
+                </div>
+
+                <div class="absolute -top-2 -left-2 w-[96%] h-[96%] border border-brand-orange/50 z-0 sm:hidden"></div>
+                <div
+                  class="absolute bottom-2 right-2 w-[94%] h-[94%] border border-brand-orange/30 z-0 sm:hidden"></div>
+              </div>
+            </div>
+
+            <!-- TEXTO -->
+            <div class="flex-1 text-center md:text-left animate-on-load" id="textContainer">
+              <h1
+                class="text-5xl sm:text-6xl md:text-7xl lg:text-[3.5rem] font-extrabold leading-[1.1] tracking-tighter text-brand-orange mb-3"
+                id="heroTitle">
+                Sincroniza tu talento,<br />
+                <span>simplifica tus entregas</span>
+              </h1>
+
+              <p
+                class="text-gray-300 text-base md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 font-light mb-5"
+                id="heroParagraph">
+                Eleva la experiencia de tus clientes con un portal privado, elegante y diseñado exclusivamente para
+                flujos de trabajo visuales. Permíteles revisar tu trabajo, dejar feedback preciso y cerrar proyectos en
+                la mitad del tiempo.
+              </p>
+
+              <div id="heroButton">
+                <button
+                  class="group w-14 h-14 md:w-16 md:h-16 rounded-full border border-brand-orange/70 bg-transparent flex items-center justify-center mx-auto md:mx-0 hover:border-brand-orange hover:bg-brand-orange/5 transition-all duration-300">
+                  <svg class="w-5 h-5 md:w-6 md:h-6 text-brand-orange ml-0.5" viewBox="0 0 24 24" fill="none">
+                    <polygon points="5 3 19 12 5 21 5 3" fill="#FF4D00" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SECCIÓN 2: 6 RECTÁNGULOS ASIMÉTRICOS ========== -->
+      <section class="w-full py-4 md:py-8 px4 md:px-12 lg:px-20">
+        <div class="max-w-[892px] w-full mx-auto">
+          <!-- Grid de 3 columnas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <!-- ========== COLUMNA 1: Grande arriba (con texto), Pequeño abajo ========== -->
+            <div class="flex flex-col gap-2">
+              <!-- Rectángulo GRANDE -->
+              <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
+                <!-- Imagen -->
+                <img src="assets/images/seccion2_1.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+
+                <!-- Capa oscura (normal invisible, hover visible) -->
+                <div
+                  class="absolute top-0 left-0 w-full h-full bg-black/70 transition-all duration-500 group-hover:bg-[#061400]/70"></div>
+
+                <!-- Título (visible siempre) -->
+                <div class="absolute inset-0 flex items-center justify-center z-10">
+                  <h3
+                    class="text-brand-orange text-3xl md:text-5xl font-bold font-custom text-center px-4 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
+                    CARGA SIN LIMITES
+                  </h3>
+                </div>
+
+                <!-- "+" en esquina superior derecha -->
+                <div
+                  class="absolute top-4 right-4 z-10 transition-all duration-500 group-hover:opacity-0 group-hover:rotate-90">
+                  <span class="text-brand-orange text-2xl md:text-3xl font-light">+</span>
+                </div>
+
+                <!-- Texto descriptivo (aparece al hover) -->
+                <div
+                  class="absolute inset-0 flex items-center justify-center z-20 opacity-0 transition-all duration-500 group-hover:opacity-100">
+                  <p class="text-white text-center px-6 text-sm md:text-base font-molengo">
+                    Espacios privados y elegantes en alta fidelidad. Sube tus sesiones completas sin enlaces que
+                    expiran.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Rectángulo PEQUEÑO (solo imagen) -->
+              <div class="w-full [482/331]"></div>
+            </div>
+
+            <!-- ========== COLUMNA 2: Pequeño arriba, Grande abajo (con texto) ========== -->
+            <div class="flex flex-col gap-2">
+              <!-- Rectángulo PEQUEÑO (solo imagen) -->
+              <div class="opacity-0 aspect-[482/331] relative overflow-hidden mx-auto my-0">
+                <img src="assets/images/seccion2_2_2.webp" class="w-full h-full object-cover" />
+              </div>
+
+              <!-- Rectángulo GRANDE con texto CENTRADO -->
+              <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
+                <!-- Imagen -->
+                <img src="assets/images/seccion2_2.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+
+                <!-- Capa oscura (normal invisible, hover visible) -->
+                <div
+                  class="absolute top-0 left-0 w-full h-full bg-black/70 transition-all duration-500 group-hover:bg-[#061400]/70"></div>
+
+                <!-- Título (visible siempre) -->
+                <div class="absolute inset-0 flex items-center justify-center z-10">
+                  <h3
+                    class="text-brand-orange text-3xl md:text-5xl font-bold font-custom text-center px-4 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
+                    CONTROL CENTRALIZADO
+                  </h3>
+                </div>
+
+                <!-- "+" en esquina superior derecha -->
+                <div
+                  class="absolute top-4 right-4 z-10 transition-all duration-500 group-hover:opacity-0 group-hover:rotate-90">
+                  <span class="text-brand-orange text-2xl md:text-3xl font-light">+</span>
+                </div>
+
+                <!-- Texto descriptivo (aparece al hover) -->
+                <div
+                  class="absolute inset-0 flex items-center justify-center z-20 opacity-0 transition-all duration-500 group-hover:opacity-100">
+                  <p class="text-white text-center px-6 text-sm md:text-base font-molengo">
+                    Un panel intuitivo para gestionar aprobaciones y cambios en tiempo real. Tu producción organizada de
+                    inicio a fin.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== COLUMNA 3: Grande arriba (con texto), Pequeño abajo ========== -->
+            <div class="flex flex-col gap-2">
+              <!-- Rectángulo GRANDE con texto CENTRADO -->
+              <div class="border border-brand-orange aspect-[482/571] relative overflow-hidden group">
+                <!-- Imagen -->
+                <img src="assets/images/seccion2_3.webp" class="absolute top-0 left-0 w-full h-full object-cover" />
+
+                <!-- Capa oscura (normal invisible, hover visible) -->
+                <div
+                  class="absolute top-0 left-0 w-full h-full bg-black/70 transition-all duration-500 group-hover:bg-[#061400]/70"></div>
+
+                <!-- Título (visible siempre) -->
+                <div class="absolute inset-0 flex items-center justify-center z-10">
+                  <h3
+                    class="text-brand-orange text-3xl md:text-5xl font-bold font-custom text-center px-4 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
+                    FEEDBACK AL INSTANTE
+                  </h3>
+                </div>
+
+                <!-- "+" en esquina superior derecha -->
+                <div
+                  class="absolute top-4 right-4 z-10 transition-all duration-500 group-hover:opacity-0 group-hover:rotate-90">
+                  <span class="text-brand-orange text-2xl md:text-3xl font-light">+</span>
+                </div>
+
+                <!-- Texto descriptivo (aparece al hover) -->
+                <div
+                  class="absolute inset-0 flex items-center justify-center z-20 opacity-0 transition-all duration-500 group-hover:opacity-100">
+                  <p class="text-white text-center px-6 text-sm md:text-base font-molengo">
+                    Tus clientes seleccionan y comentan directamente sobre la imagen. Olvida las descripciones
+                    imprecisas por chat.
+                  </p>
+                </div>
+              </div>
+              <!-- Rectángulo PEQUEÑO -->
+              <div class="w-full [482/331]"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
