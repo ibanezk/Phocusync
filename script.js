@@ -1,3 +1,5 @@
+gsap.registerPlugin(ScrollTrigger);
+
 // ============================================================
 // 1. OPTIMIZACIONES GENERALES (imágenes lazy, will-change)
 // ============================================================
@@ -110,9 +112,36 @@ if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMobileMenu);
 document.querySelectorAll(".mobile-nav-link").forEach((link) => link.addEventListener("click", closeMobileMenu));
 
 // ============================================================
-// 5. ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER (Sincronización estricta)
+// 5. ANIMACIÓN BUCLE INFINITO
 // ============================================================
-gsap.registerPlugin(ScrollTrigger);
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Aseguramos que Google Fonts se haya renderizado por completo antes de medir
+  document.fonts.ready.then(() => {
+    const marqueeContent = document.getElementById("marqueeContent");
+    const firstTrack = document.querySelectorAll(".marquee-track")[0];
+
+    // Medimos el ancho exacto de una sola pista (el bloque de palabras completo)
+    const trackWidth = firstTrack.getBoundingClientRect().width;
+
+    // Animación fluida con GSAP Modifiers para un bucle infinito real
+    gsap.to(marqueeContent, {
+      x: -trackWidth,
+      duration: 15, // Más segundos = más lento y elegante
+      ease: "none",
+      repeat: -1,
+      modifiers: {
+        // Esta función hace que cuando el contenedor se desplace el ancho de una pista,
+        // vuelva a 0 instantáneamente sin saltos ópticos
+        x: gsap.utils.unitize((x) => parseFloat(x) % trackWidth),
+      },
+    });
+  });
+});
+
+// ============================================================
+// 6. ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER (Sincronización estricta)
+// ============================================================
 
 const cardsContainer = document.querySelector(".grid");
 const cards = document.querySelectorAll(".flex.flex-col.gap-2");
@@ -149,9 +178,66 @@ if (cardsContainer && cards.length) {
       y: 0,
       duration: 1,
       ease: "power2.out",
-      // Sin stagger, para que las 3 entren en el mismo milisegundo exacto
     });
   });
 }
+
+// ============================================================
+// 7. ANIMACIÓN SECCIÓN CÓMO FUNCIONA
+// ============================================================
+
+// Esperamos a que cargue el DOM
+document.addEventListener("DOMContentLoaded", () => {
+  // Seleccionamos todas las filas de los pasos
+  const steps = document.querySelectorAll("#how-it-works .grid");
+
+  steps.forEach((step, index) => {
+    const text = step.querySelector(".step-text");
+    const mockup = step.querySelector(".step-mockup");
+
+    // Determinamos la dirección según el índice (Paso 1 y 3 entran diferente al Paso 2)
+    // Si index es impar (Paso 2), el texto viene de la derecha (x: 100) y mockup de la izquierda (x: -100)
+    const isEven = index % 2 === 0;
+    const textFromX = isEven ? -60 : 60;
+    const mockupFromX = isEven ? 60 : -60;
+    const rotationFrom = isEven ? 4 : -4; // Rotación sutil inicial para el mockup
+
+    // Creación de la línea de tiempo de GSAP vinculada al scroll de esta fila
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: step,
+        start: "top 80%", // La animación arranca cuando el tope de la fila llega al 80% del alto de la pantalla
+        end: "top 50%", // Termina de ejecutarse al llegar al 50%
+        toggleActions: "play none none reverse", // Se reproduce al bajar, se revierte de forma fluida si suben
+      },
+    });
+
+    // Animación del bloque de Texto
+    tl.from(
+      text,
+      {
+        opacity: 0,
+        x: textFromX,
+        duration: 1,
+        ease: "power2.out",
+      },
+      0,
+    ); // El ', 0' hace que corran al mismo tiempo
+
+    // Animación del bloque Mockup (Con un ligero efecto 3D rotativo de entrada)
+    tl.from(
+      mockup,
+      {
+        opacity: 0,
+        x: mockupFromX,
+        rotation: rotationFrom,
+        scale: 0.95,
+        duration: 1.2,
+        ease: "power3.out",
+      },
+      0,
+    );
+  });
+});
 
 console.log("✅ animations.js cargado y loader integrado");

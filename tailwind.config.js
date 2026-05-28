@@ -8,7 +8,7 @@ module.exports = {
       fontFamily: {
         serif: ["Cormorant Garamond", "serif"],
         sans: ["Inter", "sans-serif"],
-        molengo: ["Molengo", "sans-serif"],
+        molengo: ['"Molengo"', "sans-serif"],
       },
       // Añadimos el color oscuro de fondo por si lo quieres usar como clase
       colors: {

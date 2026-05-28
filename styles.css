@@ -59,6 +59,9 @@ img:not(.group img) {
 
 .bg-hero-gradient {
   background: linear-gradient(90deg, #1a3a1c, #0f2a0a);
+  contain: paint;
+  /* Fuerza a que el fondo viva en una capa separada de la GPU */
+  transform: translateZ(0);
 }
 
 body {
@@ -110,6 +113,14 @@ body.menu-open #menuBtn {
 /* Evitar que el hover recalcule layout */
 .group {
   will-change: transform;
+}
+
+/* Ajuste para el texto en hover */
+.group:hover .group-hover\:translate-y-0 {
+  transform: translateY(0);
+}
+.group .group-hover\:translate-y-4 {
+  transform: translateY(1rem);
 }
 
 /* FORZAR MENÚ HORIZONTAL */
