@@ -1,4 +1,4 @@
-
 {
   "tailwindCSS.experimental.configFile": "./tailwind.config.js",
+  "liveServer.settings.port": 5501
 }

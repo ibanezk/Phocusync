@@ -15,7 +15,7 @@ const animatedElements = document.querySelectorAll(
 animatedElements.forEach((el) => (el.style.willChange = "transform, opacity"));
 
 // ============================================================
-// 2. FUNCIÓN DE ANIMACIÓN DEL HERO (COMPLETA, CON CAÍDA DEL MENÚ)
+// 2. FUNCIÓN DE ANIMACIÓN DEL HERO
 // ============================================================
 function startHeroAnimation() {
   // Asegurar visibilidad por si algún elemento quedó oculto
@@ -238,6 +238,249 @@ document.addEventListener("DOMContentLoaded", () => {
       0,
     );
   });
+});
+
+// ============================================================
+// 8. ANIMACIÓN SECCIÓN PRECIOS
+// ============================================================
+
+// 1. Animación de entrada con ScrollTrigger
+const pricingTimeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: "#pricing",
+    start: "top 75%", // Se activa cuando la parte superior de la sección llega al 75% del viewport
+    toggleActions: "play none none reverse",
+  },
+});
+
+pricingTimeline
+  // Aparece el título y su línea decorativa primero
+  .from("#pricing h2, #pricing .w-14", {
+    y: 30,
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.1,
+    ease: "power2.out",
+  })
+  // Entran las tarjetas en cascada (stagger) de izquierda a derecha
+  .from(
+    ".pricing-card",
+    {
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power3.out",
+    },
+    "-=0.3",
+  ) // Se solapa un poco con la animación del título para mayor fluidez
+  // Por último, aparecen los 3 puntitos de paginación de golpe
+  .from(
+    "#pricing .flex.justify-center.items-center.gap-3",
+    {
+      y: 15,
+      opacity: 0,
+      duration: 0.4,
+      ease: "power2.out",
+    },
+    "-=0.2",
+  );
+
+// ==================== INTERACCIÓN HOVER EN LAS TARJETAS ====================
+
+// Seleccionamos todas las tarjetas de precios
+const pricingCards = document.querySelectorAll(".pricing-card");
+
+pricingCards.forEach((card) => {
+  // Buscamos el botón interno
+  const button = card.querySelector("button");
+  if (!button) return; // Seguridad por si acaso
+
+  // Creamos una animación individual para el hover de cada tarjeta
+  const hoverAnimation = gsap.timeline({ paused: true });
+
+  // Verificamos si esta tarjeta es la Pro (buscando si su fondo es el oscuro destacado #132830)
+  // O si prefieres puedes ponerle una clase única en el HTML como 'card-pro'
+  const isFeatured = card.getBoundingClientRect().width > 0 && card.innerHTML.includes("Pro Studio");
+
+  if (isFeatured) {
+    // Si es la central (Pro Studio), solo la elevamos un extra y aumentamos su brillo
+    hoverAnimation.to(card, {
+      y: -12,
+      borderColor: "rgba(255, 107, 0, 1)",
+      boxShadow: "0 15px 40px rgba(255, 107, 0, 0.12)",
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  } else {
+    // Si son las laterales, suben desde su posición plana y su borde se ilumina levemente
+    hoverAnimation.to(card, {
+      y: -10,
+      borderColor: "rgba(255, 107, 0, 0.4)",
+      boxShadow: "0 15px 30px rgba(0, 0, 0, 0.3)",
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  }
+
+  // Animación para el botón interno
+  hoverAnimation.to(
+    button,
+    {
+      scale: 1.02,
+      duration: 0.2,
+      ease: "power1.out",
+    },
+    0,
+  );
+
+  // EVENTOS DEL MOUSE
+  card.addEventListener("mouseenter", () => {
+    hoverAnimation.play();
+
+    // EFECTO DE JERARQUÍA SEGURO: Buscamos la tarjeta Pro Studio usando texto, sin selectores raros
+    if (!isFeatured) {
+      pricingCards.forEach((c) => {
+        if (c.innerHTML.includes("Pro Studio")) {
+          gsap.to(c, {
+            opacity: 0.65,
+            scale: 0.98,
+            duration: 0.3,
+          });
+        }
+      });
+    }
+  });
+
+  card.addEventListener("mouseleave", () => {
+    hoverAnimation.reverse();
+
+    // Restauramos la tarjeta central de forma segura
+    if (!isFeatured) {
+      pricingCards.forEach((c) => {
+        if (c.innerHTML.includes("Pro Studio")) {
+          gsap.to(c, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.3,
+          });
+        }
+      });
+    }
+  });
+});
+
+// ============================================================
+// 9. ANIMACIÓN SECCIÓN TESTIMONIOS
+// ============================================================
+
+gsap.from(".testimonial-card", {
+  scrollTrigger: {
+    trigger: "#testimonials",
+    start: "top 80%", // Se dispara un poco antes para que la transición sea suave
+    toggleActions: "play none none reverse",
+  },
+  y: 35,
+  opacity: 0,
+  duration: 0.8,
+  stagger: 0.15, // Aparecen una tras otra de izquierda a derecha
+  ease: "power2.out",
+});
+
+// ============================================================
+// 10. ANIMACIÓN SECCIÓN CTA
+// ============================================================
+
+// ==================== ANIMACIÓN DE ENTRADA (SCROLLTRIGGER) ====================
+
+// 1. Entrada de la caja principal
+gsap.from(".cta-container", {
+  scrollTrigger: {
+    trigger: "#final-cta",
+    start: "top bottom", // Se dispara apenas entra a la vista
+    toggleActions: "play none none reverse",
+  },
+  y: 40,
+  opacity: 0,
+  duration: 0.8,
+  ease: "power3.out",
+});
+
+// 2. Entrada de las formas geométricas
+// Entrada de las formas geométricas obligando el estado final
+gsap.fromTo(
+  ".cta-shape",
+  {
+    opacity: 0,
+    scale: 0.8,
+  }, // Estado Inicial
+  {
+    opacity: 1,
+    scale: 1,
+    duration: 1,
+    stagger: 0.15,
+    delay: 0.3,
+    ease: "power2.out",
+    scrollTrigger: {
+      trigger: "#final-cta",
+      start: "top 90%", // Se dispara apenas asoma la sección
+      toggleActions: "play none none reverse",
+    },
+  }, // Estado Final
+);
+
+// ==================== INTERACCIÓN GEOMÉTRICA CON EL MOUSE ====================
+const ctaContainer = document.querySelector(".cta-container");
+const ctaShapes = document.querySelectorAll(".cta-shape");
+
+if (ctaContainer && ctaShapes.length > 0) {
+  ctaContainer.addEventListener("mousemove", (e) => {
+    const { left, top, width, height } = ctaContainer.getBoundingClientRect();
+
+    // Posición del mouse relativa al centro (-0.5 a 0.5)
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+
+    // Movimiento sutil de las líneas (efecto profundidad)
+    ctaShapes.forEach((shape, index) => {
+      const factor = (index + 1) * 15;
+      gsap.to(shape, {
+        x: x * factor,
+        y: y * factor,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    });
+  });
+
+  // Resetear al salir el cursor
+  ctaContainer.addEventListener("mouseleave", () => {
+    ctaShapes.forEach((shape) => {
+      gsap.to(shape, {
+        x: 0,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+    });
+  });
+}
+
+// ============================================================
+// 11. ANIMACIÓN FOOTER
+// ============================================================
+
+gsap.from("footer flex", {
+  scrollTrigger: {
+    trigger: "footer",
+    start: "top bottom",
+    toggleActions: "play none none reverse",
+  },
+  opacity: 0,
+  y: 15,
+  duration: 0.6,
+  stagger: 0.1,
+  ease: "power2.out",
 });
 
 console.log("✅ animations.js cargado y loader integrado");

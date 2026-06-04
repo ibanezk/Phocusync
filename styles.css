@@ -1,12 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap");
 
-@font-face {
-  font-family: "Mango_Grotesque";
-  src: url("assets/fonts/MangoGrotesque-Regular.woff2") format("woff2");
-  font-style: normal;
-  font-display: swap;
-}
-
 .grid {
   will-change: transform;
   contain: layout style paint;
@@ -49,18 +42,24 @@ img:not(.group img) {
   white-space: nowrap !important;
 }
 
-.bg-hero-gradient {
-  background: linear-gradient(125deg, #1a3a2a, #0a1a2a);
-}
-
 .text-brand-orange {
   color: #ff4d00;
 }
 
 .bg-hero-gradient {
-  background: linear-gradient(90deg, #1a3a1c, #0f2a0a);
+  /* Fondo base oscuro por si el navegador tarda en renderizar el gradiente */
+  background-color: rgba(2, 29, 48, 1);
+
+  /* Doble capa de fondo: textura de grano orgánico arriba, tu gradiente abajo */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+    linear-gradient(158deg, rgba(2, 29, 48, 1) 0%, rgba(0, 36, 19, 1) 50%, rgba(4, 36, 25, 1) 100%);
+
+  /* 'auto' asegura que el ruido repita de forma infinita y tu gradiente cubra todo el ancho */
+  background-size: auto;
+
+  /* Optimizaciones de rendimiento nativas de tu código */
   contain: paint;
-  /* Fuerza a que el fondo viva en una capa separada de la GPU */
   transform: translateZ(0);
 }
 
