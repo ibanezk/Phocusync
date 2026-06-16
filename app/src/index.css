@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  /* Esto le asigna la fuente Inter (o la sans-serif del sistema) a la clase font-sans */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
