@@ -10,14 +10,39 @@ export function useDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({ proyectos: 0, fotos: 0, almacenamiento: "0 GB" });
   const [menuAbierto, setMenuAbierto] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
+  // Nuevos estados para controlar el plan y límites
+  const [planActual, setPlanActual] = useState("Standard");
+  const [almacenamientoMaximo, setAlmacenamientoMaximo] = useState(1.0);
+
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Obtenemos el usuario directamente aquí para evitar desfases de estados asíncronos
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Consultar el plan del fotógrafo en tu tabla real
+      const { data: fotografo } = await supabase.from("fotografos").select("plan").eq("id", user.id).maybeSingle();
+
+      const configPlanes = {
+        standard: { nombre: "Standard", max: 1.0 },
+        pro_studio: { nombre: "Pro Studio", max: 50.0 },
+        agency: { nombre: "Agency", max: 50.0 },
+      };
+
+      const planKey = fotografo?.plan?.toLowerCase() || "standard";
+      const config = configPlanes[planKey] || configPlanes.standard;
+
+      setPlanActual(config.nombre);
+      setAlmacenamientoMaximo(config.max);
+
+      // Consultar proyectos (Tu consulta original intacta)
       const { data: proyectosData, error: proyectosError } = await supabase
         .from("proyectos")
         .select(
@@ -65,7 +90,7 @@ export function useDashboard() {
       setStats({
         proyectos: proyectosConContadores.length,
         fotos: acumuladoFotosGlobal,
-        almacenamiento: almacenamientoLegible,
+        almacenamiento: `${almacenamientoLegible} / ${config.max.toFixed(1)} GB`,
       });
     } catch (err) {
       console.error("Error general en el Dashboard:", err.message);
@@ -92,14 +117,24 @@ export function useDashboard() {
     checkUser();
   }, [navigate, fetchDashboardData]);
 
+  // Evaluamos el límite basándonos en los datos ya procesados en local
+  const haAlcanzadoElLimite = planActual === "Standard" && proyectos.length >= 3;
+
   const handleCreateProject = async (e) => {
     e.preventDefault();
     if (!projectName.trim()) return;
+
+    // Candado de seguridad por si intentan saltarse la UI
+    if (haAlcanzadoElLimite) {
+      setIsModalOpen(false);
+      return;
+    }
+
     setIsCreating(true);
 
     const { data, error } = await supabase
       .from("proyectos")
-      .insert([{ nombre: projectName, fotógrafo_id: userId }])
+      .insert([{ nombre: projectName, fotografo_id: userId }])
       .select();
 
     if (error) {
@@ -108,7 +143,7 @@ export function useDashboard() {
       const nuevoProyecto = data[0];
       setProjectName("");
       setIsModalOpen(false);
-      navigate(`/proyecto/${nuevoProyecto.id}`);
+      navigate(`/dashboard/proyecto/${nuevoProyecto.id}`);
     }
     setIsCreating(false);
   };
@@ -136,6 +171,8 @@ export function useDashboard() {
     isCreating,
     handleCreateProject,
     handleLogout,
-    navigateToProject: (id) => navigate(`/proyecto/${id}`),
+    navigateToProject: (id) => navigate(`/dashboard/proyecto/${id}`),
+    planActual,
+    haAlcanzadoElLimite,
   };
 }

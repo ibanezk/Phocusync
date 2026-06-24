@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handleLogout }) {
   return (
     <>
-      {/* 🍔 BOTÓN HAMBURGUESA */}
+      {/* BOTÓN HAMBURGUESA */}
       <button
         onClick={() => setMenuAbierto(!menuAbierto)}
         className="fixed top-4 right-4 z-50 p-1.5 bg-[#0c1f27] border border-white/10 text-white md:hidden hover:text-[#ff4d00] transition-colors"
@@ -31,7 +32,7 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
         )}
       </button>
 
-      {/* 🖤 OVERLAY OSCURO ANIMADO PARA MÓVIL */}
+      {/* OVERLAY OSCURO ANIMADO PARA MÓVIL */}
       <AnimatePresence>
         {menuAbierto && (
           <motion.div
@@ -44,7 +45,7 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
         )}
       </AnimatePresence>
 
-      {/* 📂 ESTRUCTURA DEL ASIDE RESPONSIVO */}
+      {/* ESTRUCTURA DEL ASIDE RESPONSIVO */}
       <aside
         className={`bg-[#09171d] border-r border-white/5 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out z-40
           fixed top-0 bottom-0 left-0 w-64
@@ -82,24 +83,39 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
           </div>
 
           <nav className="space-y-2">
-            <a
-              href="#"
-              onClick={() => setMenuAbierto(false)}
-              className="block px-4 py-2.5 text-xs tracking-widest uppercase font-medium text-[#ff4d00] bg-[#0c1f27]">
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 h-11 text-xs font-bold tracking-widest uppercase transition-all rounded-md ${
+                  isActive
+                    ? "bg-[#ff4d00]/10 text-white border-l-2 border-[#ff4d00]"
+                    : "text-gray-400 hover:bg-white/[0.02] hover:text-white"
+                }`
+              }>
               Panel General
-            </a>
-            <a
-              href="#"
-              onClick={() => setMenuAbierto(false)}
-              className="block px-4 py-2.5 text-xs tracking-widest uppercase font-medium text-gray-400 hover:text-white transition-colors">
+            </NavLink>
+            <NavLink
+              to="/dashboard/galerias"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 h-11 text-xs font-bold tracking-widest uppercase transition-all rounded-md ${
+                  isActive
+                    ? "bg-[#ff4d00]/10 text-white border-l-2 border-[#ff4d00]"
+                    : "text-gray-400 hover:bg-white/[0.02] hover:text-white"
+                }`
+              }>
               Galerías
-            </a>
-            <a
-              href="#"
-              onClick={() => setMenuAbierto(false)}
-              className="block px-4 py-2.5 text-xs tracking-widest uppercase font-medium text-gray-400 hover:text-white transition-colors">
+            </NavLink>
+            <NavLink
+              to="/dashboard/ajustes"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 h-11 text-xs font-bold tracking-widest uppercase transition-all rounded-md ${
+                  isActive
+                    ? "bg-[#ff4d00]/10 text-white border-l-2 border-[#ff4d00]"
+                    : "text-gray-400 hover:bg-white/[0.02] hover:text-white"
+                }`
+              }>
               Ajustes
-            </a>
+            </NavLink>
           </nav>
         </div>
 

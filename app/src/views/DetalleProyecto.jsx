@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import useDetalleProyecto from "../hooks/useDetalleProyecto";
+import { usePermitirDescarga } from "../hooks/usePermitirDescarga";
+import { useAjustesProyecto } from "../hooks/useSeleccionMarcaAgua";
 import HeaderProyecto from "../components/DetalleProyecto/HeaderDetalleProyecto";
 import UploadZone from "../components/DetalleProyecto/UploadZone";
 import ControlesCarrete from "../components/DetalleProyecto/ControlesCarrete";
@@ -10,8 +12,20 @@ export default function DetalleProyecto() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Extraemos toda la lógica desde nuestro Custom Hook
+  // Extraemos toda la lógica desde nuestro Custom Hook principal
   const { state, actions, refs } = useDetalleProyecto(id, navigate);
+
+  // Hook existente para descargas por lote
+  const { permitirDescarga, guardandoDescarga, handleToggleDescarga } = usePermitirDescarga(
+    id,
+    state.proyecto?.permitir_descarga,
+  );
+
+  // Conexión del nuevo mini-hook para controlar límites y marca de agua de este proyecto
+  const { limiteSelecciones, forzarMarcaAgua, guardandoAjustes, actualizarAjuste } = useAjustesProyecto(
+    id,
+    state.proyecto,
+  );
 
   if (state.loading) {
     return (
@@ -42,6 +56,7 @@ export default function DetalleProyecto() {
         />
 
         <div className="lg:col-span-2 bg-[#09171d] border border-white/5 p-6 space-y-4">
+          {/* PROPS ENRIQUECIDOS: Ahora pasamos los nuevos ajustes a ControlesCarrete */}
           <ControlesCarrete
             fotos={state.fotos}
             fotosFiltradas={state.fotosFiltradas}
@@ -52,6 +67,13 @@ export default function DetalleProyecto() {
             handleCopiarNombres={actions.handleCopiarNombres}
             copiado={state.copiado}
             abrirConfirmacionMasiva={actions.abrirConfirmacionMasiva}
+            permitirDescargas={permitirDescarga}
+            handleToggleDescargas={handleToggleDescarga}
+            guardandoDescarga={guardandoDescarga}
+            limiteSelecciones={limiteSelecciones}
+            forzarMarcaAgua={forzarMarcaAgua}
+            guardandoAjustes={guardandoAjustes}
+            actualizarAjuste={actualizarAjuste}
           />
 
           <FotoGrid

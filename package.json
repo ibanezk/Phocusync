@@ -5,5 +5,8 @@
   },
   "scripts": {
     "dev": "tailwindcss -i style.css -o output.css --watch"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
   }
 }
