@@ -11,7 +11,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboard } from "../hooks/useDashboard";
-import StatCard from "../components/Dashboard/StatCard";
+import StatCard from "../components/Dashboard/Statcard";
 import ProjectCard from "../components/Dashboard/ProjectCard";
 import NewProjectModal from "../components/Dashboard/NewProjectModal";
 
