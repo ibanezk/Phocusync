@@ -1,0 +1,17 @@
+{
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/login",
+      "destination": "/app/dist/index.html"
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/app/dist/index.html"
+    },
+    {
+      "source": "/galeria/:path*",
+      "destination": "/app/dist/index.html"
+    }
+  ]
+}

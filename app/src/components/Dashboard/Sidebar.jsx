@@ -1,3 +1,10 @@
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Componente: Sidebar.jsx                                                   */
+/* Propósito: Barra de navegación lateral responsiva con soporte para móvil  */
+/*            mediante estados colapsables, animaciones y control de sesión. */
+/* ========================================================================= */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
 
@@ -5,6 +12,7 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
   return (
     <>
       {/* BOTÓN HAMBURGUESA */}
+      {/* Visible únicamente en viewports móviles (md:hidden). Cambia dinámicamente el icono SVG */}
       <button
         onClick={() => setMenuAbierto(!menuAbierto)}
         className="fixed top-4 right-4 z-50 p-1.5 bg-[#0c1f27] border border-white/10 text-white md:hidden hover:text-[#ff4d00] transition-colors"
@@ -33,6 +41,7 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
       </button>
 
       {/* OVERLAY OSCURO ANIMADO PARA MÓVIL */}
+      {/* Fondo traslúcido con desenfoque de fondo que se desmonta con animación gracias a AnimatePresence */}
       <AnimatePresence>
         {menuAbierto && (
           <motion.div
@@ -46,12 +55,14 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
       </AnimatePresence>
 
       {/* ESTRUCTURA DEL ASIDE RESPONSIVO */}
+      {/* Alterna su posición física en móviles usando 'translate-x' según el estado 'menuAbierto' */}
       <aside
         className={`bg-[#09171d] border-r border-white/5 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out z-40
           fixed top-0 bottom-0 left-0 w-64
           ${menuAbierto ? "translate-x-0" : "-translate-x-full"} 
           md:relative md:translate-x-0 md:w-64`}>
         <div className="space-y-8 pt-12 md:pt-0">
+          {/* IDENTIDAD VISUAL / LOGO */}
           <div className="flex items-center gap-2">
             <span className="text-lg font-medium tracking-wide text-white">
               Phocu<span className="text-[#ff4d00]">Sync</span>
@@ -82,6 +93,8 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
             </div>
           </div>
 
+          {/* MENÚ DE NAVEGACIÓN PRINCIPAL */}
+          {/* Se utiliza NavLink para inyectar estilos de activación dinámicos (isActive) según la ruta */}
           <nav className="space-y-2">
             <NavLink
               to="/dashboard"
@@ -119,6 +132,7 @@ export default function Sidebar({ menuAbierto, setMenuAbierto, userEmail, handle
           </nav>
         </div>
 
+        {/* PIE DE LA BARRA LATERAL (Información del Usuario Activo) */}
         <div className="pt-6 border-t border-white/5 space-y-3">
           <div className="text-xs text-gray-400 truncate">{userEmail || "Cargando..."}</div>
           <button

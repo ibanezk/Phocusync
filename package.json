@@ -1,10 +1,13 @@
 {
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.0",
+    "concurrently": "^10.0.3",
+    "lite-server": "^2.6.1",
     "tailwindcss": "^4.3.0"
   },
   "scripts": {
-    "dev": "tailwindcss -i style.css -o output.css --watch"
+    "dev": "concurrently \"tailwindcss -i styles.css -o output.css --watch\" \"lite-server\"",
+    "build": "tailwindcss -i styles.css -o output.css"
   },
   "dependencies": {
     "jszip": "^3.10.1"

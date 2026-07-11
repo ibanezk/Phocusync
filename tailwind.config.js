@@ -10,11 +10,6 @@ module.exports = {
         sans: ["Inter", "sans-serif"],
         molengo: ['"Molengo"', "sans-serif"],
       },
-      // Añadimos el color oscuro de fondo por si lo quieres usar como clase
-      colors: {
-        dark: "#0A0A0A",
-        gold: "#C5A059",
-      },
     },
   },
   plugins: [],

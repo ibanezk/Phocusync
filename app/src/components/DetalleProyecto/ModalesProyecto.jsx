@@ -1,3 +1,11 @@
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Componente: ModalesProyecto.jsx                                           */
+/* Descripción: Hub centralizado y estandarizado de ventanas emergentes.    */
+/*              Todos los estados de control consumen una estructura homogénea*/
+/*              de objeto { isOpen: boolean } para garantizar escalabilidad. */
+/* ========================================================================= */
+
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ModalesProyecto({
@@ -7,21 +15,24 @@ export default function ModalesProyecto({
   modalEliminarMasivo,
   setModalEliminarMasivo,
   ejecutarEliminarMasivo,
-  modalEliminarProyecto,
+  modalEliminarProyecto, // Estandarizado: Ahora se evalúa como objeto { isOpen: boolean }
   setModalEliminarProyecto,
   ejecutarEliminarProyecto,
   proyecto,
   selectedFotos,
   modalComentario,
   setModalComentario,
-  modalCompartir,
+  modalCompartir, // Estandarizado: Ahora se evalúa como objeto { isOpen: boolean }
   setModalCompartir,
   urlPublica,
   enlaceCopiado,
   handleCopiarEnlaceCompartir,
 }) {
   return (
+    // AnimatePresence habilita la detección de desmontaje en el DOM para ejecutar los efectos 'exit'
     <AnimatePresence>
+      {/* ─── MODAL 1: ELIMINAR FOTOGRAFÍA INDIVIDUAL ─── */}
+      {/* Controla la destrucción de un único recurso multimedia en el Storage/BD */}
       {modalEliminar.isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -50,6 +61,8 @@ export default function ModalesProyecto({
         </motion.div>
       )}
 
+      {/* ─── MODAL 2: ELIMINAR SELECCIÓN EN LOTE (MASIVO) ─── */}
+      {/* Advierte al fotógrafo la cantidad exacta de archivos indexados en el array de selección masiva */}
       {modalEliminarMasivo.isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -80,7 +93,9 @@ export default function ModalesProyecto({
         </motion.div>
       )}
 
-      {modalEliminarProyecto && (
+      {/* ─── MODAL 3: ELIMINACIÓN DE PROYECTO COMPLETO (ZONA CRÍTICA) ─── */}
+      {/* CORRECCIÓN ARQUITECTÓNICA: Evalúa la propiedad '.isOpen' del estado estructurado */}
+      {modalEliminarProyecto.isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -95,8 +110,9 @@ export default function ModalesProyecto({
               ¿Seguro que quiere borrar el proyecto "{proyecto?.nombre}"?
             </h3>
             <div className="flex gap-3 justify-center">
+              {/* Resetea el estado pasando un objeto con bandera false */}
               <button
-                onClick={() => setModalEliminarProyecto(false)}
+                onClick={() => setModalEliminarProyecto({ isOpen: false })}
                 className="flex-1 bg-white/5 text-gray-300 text-[10px] py-2.5 border border-white/5">
                 Cancelar
               </button>
@@ -108,6 +124,8 @@ export default function ModalesProyecto({
         </motion.div>
       )}
 
+      {/* ─── MODAL 4: VISUALIZADOR DE NOTAS DE RETOQUE ─── */}
+      {/* Caja de lectura para comentarios extensos del cliente con soporte para saltos de línea (whitespace-pre-wrap) */}
       {modalComentario.isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -137,7 +155,8 @@ export default function ModalesProyecto({
         </motion.div>
       )}
 
-      {modalCompartir && (
+      {/* ─── MODAL 5: PANEL DE COMPARTICIÓN COMERCIAL ─── */}
+      {modalCompartir.isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -150,7 +169,10 @@ export default function ModalesProyecto({
             className="bg-[#121214] border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
               <h3 className="text-xs font-bold tracking-widest uppercase text-white">🔗 Compartir Galería</h3>
-              <button onClick={() => setModalCompartir(false)} className="text-gray-500 hover:text-white text-sm p-1">
+              {/* Cierre seguro mutando el estado hacia un objeto limpio */}
+              <button
+                onClick={() => setModalCompartir({ isOpen: false })}
+                className="text-gray-500 hover:text-white text-sm p-1">
                 ✕
               </button>
             </div>

@@ -1,28 +1,41 @@
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Hook: usePermitirDescarga.js                                              */
+/* Descripción: Mini-hook especializado en la gestión estacional de permisos */
+/*              de descarga masiva para los clientes. Implementa la estrategia*/
+/*              de "Optimistic Update" para una UI de alta velocidad.        */
+/* ========================================================================= */
+
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 export function usePermitirDescarga(proyectoId, valorInicial) {
-  const [permitirDescarga, setPermitirDescarga] = useState(false);
-  const [guardandoDescarga, setGuardandoDescarga] = useState(false);
+  // --- ESTADOS LOCALES DE INTERFAZ ---
+  const [permitirDescarga, setPermitirDescarga] = useState(false); // Bandera reactiva del estado del switch
+  const [guardandoDescarga, setGuardandoDescarga] = useState(false); // Estado de carga síncrono para mutaciones de red
 
-  // Sincroniza el estado local cuando el hook pesado termine de cargar el proyecto
+  // EFECTO DE SINCRONIZACIÓN ASÍNCRONA
+  // Escucha cuando el hook pesado de la vista padre termina de traer los datos desde Supabase
+  // e iguala el estado local con la columna real de la base de datos.
   useEffect(() => {
     if (valorInicial !== undefined) {
       setPermitirDescarga(valorInicial);
     }
   }, [valorInicial]);
 
+  // MUTACIÓN OPTIMISTA (Optimistic UI Update)
+  // Cambia el estado en pantalla inmediatamente y procesa la petición en segundo plano.
   const handleToggleDescarga = async () => {
     if (!proyectoId) return;
 
     const nuevoEstado = !permitirDescarga;
     setGuardandoDescarga(true);
 
-    // 1. Cambio optimista (el switch se mueve en la UI de inmediato)
+    // 1. CAMBIO OPTIMISTA: El switch se mueve en la UI de inmediato para dar sensación de velocidad instantánea
     setPermitirDescarga(nuevoEstado);
 
     try {
-      // 2. Guardamos en la nueva columna de la tabla 'proyectos'
+      // 2. Persistencia en la columna dedicada dentro de la tabla 'proyectos'
       const { error } = await supabase
         .from("proyectos")
         .update({ permitir_descarga: nuevoEstado })
@@ -32,7 +45,7 @@ export function usePermitirDescarga(proyectoId, valorInicial) {
     } catch (error) {
       console.error("Error al actualizar permisos de descarga:", error);
 
-      // 3. Reversión de seguridad: Si falla la base de datos, regresamos el switch a como estaba
+      // 3. REVERSIÓN DE SEGURIDAD (Rollback): Si la base de datos falla, regresamos el switch al estado anterior
       setPermitirDescarga(!nuevoEstado);
       alert("No se pudo guardar el cambio. Revisa tu conexión a internet.");
     } finally {
@@ -40,6 +53,7 @@ export function usePermitirDescarga(proyectoId, valorInicial) {
     }
   };
 
+  // Exposición limpia de la API del hook
   return {
     permitirDescarga,
     guardandoDescarga,

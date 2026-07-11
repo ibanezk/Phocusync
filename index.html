@@ -50,6 +50,7 @@
     </div>
 
     <main class="relative w-full min-h-screen bg-hero-gradient flex flex-col">
+      |
       <!-- HERO -->
       <section class="w-full h-auto md:h-screen flex flex-col justify-between">
         <!-- MENÚ -->
@@ -89,8 +90,11 @@
                 <a href="#how-it-works" class="text-brand-orange nav-item">Cómo funciona</a>
                 <a href="#beneficios" class="text-brand-orange nav-item">Beneficios</a>
                 <a href="#pricing" class="text-brand-orange nav-item">Planes</a>
-                <a href="#" class="text-white hover:text-brand-orange text-sm font-medium nav-item">Ingresar</a>
-                <a href="#" class="border border-brand-orange text-brand-orange px-5 py-2 rounded-full" id="contactBtn"
+                <a href="/login" class="text-white hover:text-brand-orange text-sm font-medium nav-item">Ingresar</a>
+                <a
+                  href="/login"
+                  class="border border-brand-orange text-brand-orange px-5 py-2 rounded-full"
+                  id="contactBtn"
                   >Pruebalo Gratis</a
                 >
               </div>
@@ -370,135 +374,130 @@
       </section>
 
       <!-- ==================== SECCIÓN: CÓMO FUNCIONA (ZIGZAG) ==================== -->
+      <!-- CONTENEDOR PRINCIPAL -->
       <section id="how-it-works" class="w-full py-20 md:py-32 text-white overflow-hidden">
         <div class="max-w-[1440px] w-full mx-auto px-6 md:px-12 lg:px-20">
-          <div class="text-center max-w-3xl mx-auto mb-20 md:mb-28">
+          <!-- CABECERA DE LA SECCIÓN -->
+          <div class="text-center max-w-3xl mx-auto mb-16 md:mb-28">
             <h2 class="text-xs md:text-sm font-semibold tracking-widest text-brand-orange uppercase mb-3">
               Flujo de Trabajo
             </h2>
             <p class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter leading-tight">
-              Tu trabajo listo en <br class="sm:hidden" /><span class="text-brand-orange">3 simples pasos</span>
+              Tu trabajo listo en <span class="text-brand-orange">3 simples pasos</span>
             </p>
           </div>
 
-          <div class="flex flex-col gap-24 md:gap-40">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div class="step-text space-y-4 text-center md:text-left order-2 md:order-1">
-                <div class="text-5xl md:text-6xl font-black text-brand-orange/20 font-molengo">01</div>
-                <h3 class="text-2xl md:text-3xl font-bold tracking-tight text-brand-orange">
-                  Sube tus proyectos visuales
-                </h3>
-                <p class="text-gray-400 text-base md:text-lg font-light leading-relaxed max-w-md mx-auto md:mx-0">
-                  Crea un portal privado y elegante para tu cliente en cuestión de segundos. Sube fotografías, diseños o
-                  piezas gráficas directamente sin preocuparte por el peso o la organización.
-                </p>
-              </div>
-              <div class="step-mockup flex-1 flex justify-center order-first md:order-last p-6 md:p-10 mb-8 md:mb-0">
-                <div class="relative w-[280px] sm:w-[340px] md:w-[380px] xl:w-[420px] aspect-[16/10]">
+          <!-- CONTENEDOR SPLIT-SCREEN (2 Columnas en Escritorio) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 items-center">
+            <!-- COLUMNA IZQUIERDA: Selector de Pasos (Tabs) -->
+            <div class="col-span-1 md:col-span-5 flex flex-col gap-4 md:gap-6">
+              <!-- PASO 1 (Activo por defecto) -->
+              <button
+                data-index="0"
+                class="tab-btn w-full text-left p-6 rounded-xl border transition-all duration-300 flex gap-5 group relative outline-none bg-[#0d1a1f] border-gray-800 shadow-xl">
+                <!-- Línea indicadora naranja lateral -->
+                <div
+                  class="tab-border absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl bg-brand-orange opacity-100"></div>
+                <!-- Número -->
+                <div class="tab-number text-2xl font-black font-molengo text-brand-orange">01</div>
+                <!-- Textos -->
+                <div class="space-y-2 pointer-events-none">
+                  <h3 class="tab-title text-lg md:text-xl font-bold tracking-tight text-white">
+                    Sube tus proyectos visuales
+                  </h3>
                   <div
-                    class="absolute border-2 border-brand-orange/50 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); bottom: 0; left: 0"></div>
-
-                  <div
-                    class="absolute border-2 border-brand-orange/40 pointer-events-none z-20"
-                    style="
-                      width: calc(100% + 32px);
-                      height: calc(100% + 32px);
-                      top: 50%;
-                      left: 50%;
-                      transform: translate(-50%, -50%);
-                    "></div>
-
-                  <div
-                    class="absolute border border-brand-orange/35 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); top: 0; right: 0"></div>
-
-                  <div
-                    class="relative w-full h-full bg-[#0d1a1f] border border-gray-800 shadow-2xl z-10 overflow-hidden">
-                    <img
-                      src="assets/images/paso1.webp"
-                      alt="Panel de carga de proyectos"
-                      class="w-full h-full object-cover block" />
+                    class="tab-desc overflow-hidden text-sm md:text-base text-gray-400 font-light leading-relaxed mt-2">
+                    Crea un portal privado y elegante para tu cliente en cuestión de segundos. Sube fotografías o piezas
+                    gráficas directamente sin preocuparte por la organización.
                   </div>
                 </div>
-              </div>
-            </div>
+              </button>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div class="step-mockup flex-1 flex justify-center order-first p-6 md:p-10 mb-8 md:mb-0">
-                <div class="relative w-[280px] sm:w-[340px] md:w-[380px] xl:w-[420px] aspect-[16/10]">
+              <!-- PASO 2 -->
+              <button
+                data-index="1"
+                class="tab-btn w-full text-left p-6 rounded-xl border transition-all duration-300 flex gap-5 group relative outline-none bg-transparent border-transparent opacity-40 hover:opacity-70">
+                <div
+                  class="tab-border absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl bg-brand-orange opacity-0"></div>
+                <div class="tab-number text-2xl font-black font-molengo text-gray-500">02</div>
+                <div class="space-y-2 pointer-events-none">
+                  <h3 class="tab-title text-lg md:text-xl font-bold tracking-tight text-gray-400">
+                    Feedback preciso y sin registros
+                  </h3>
                   <div
-                    class="absolute border-2 border-brand-orange/50 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); bottom: 0; left: 0"></div>
-                  <div
-                    class="absolute border-2 border-brand-orange/40 pointer-events-none z-20"
-                    style="
-                      width: calc(100% + 32px);
-                      height: calc(100% + 32px);
-                      top: 50%;
-                      left: 50%;
-                      transform: translate(-50%, -50%);
-                    "></div>
-                  <div
-                    class="absolute border border-brand-orange/35 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); top: 0; right: 0"></div>
-
-                  <div
-                    class="relative w-full h-full bg-[#0d1a1f] border border-gray-800 shadow-2xl z-10 overflow-hidden">
-                    <img
-                      src="assets/images/paso2.webp"
-                      alt="Cliente dejando feedback visual"
-                      class="w-full h-full object-cover block" />
+                    class="tab-desc overflow-hidden text-sm md:text-base text-gray-400 font-light leading-relaxed h-0 opacity-0">
+                    Olvídate de los correos interminables. Tu cliente accede a la galería mediante un enlace único y
+                    utiliza el panel de comentarios integrado para dejar sus observaciones de forma centralizada.
                   </div>
                 </div>
-              </div>
-              <div class="step-text space-y-4 text-center md:text-left order-2 md:order-2">
-                <div class="text-5xl md:text-6xl font-black text-brand-orange/20 font-molengo">02</div>
-                <h3 class="text-2xl md:text-3xl font-bold tracking-tight text-brand-orange">
-                  Feedback preciso y sin registros
-                </h3>
-                <p class="text-gray-400 text-base md:text-lg font-light leading-relaxed max-w-md mx-auto md:mx-0">
-                  Tu cliente recibe un enlace único. No necesita crear cuentas ni contraseñas; simplemente hace clic
-                  sobre cualquier parte de la imagen para dejar comentarios exactos y notas de feedback.
-                </p>
-              </div>
+              </button>
+
+              <!-- PASO 3 -->
+              <button
+                data-index="2"
+                class="tab-btn w-full text-left p-6 rounded-xl border transition-all duration-300 flex gap-5 group relative outline-none bg-transparent border-transparent opacity-40 hover:opacity-70">
+                <div
+                  class="tab-border absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl bg-brand-orange opacity-0"></div>
+                <div class="tab-number text-2xl font-black font-molengo text-gray-500">03</div>
+                <div class="space-y-2 pointer-events-none">
+                  <h3 class="tab-title text-lg md:text-xl font-bold tracking-tight text-gray-400">
+                    Aprobación en tiempo récord
+                  </h3>
+                  <div
+                    class="tab-desc overflow-hidden text-sm md:text-base text-gray-400 font-light leading-relaxed h-0 opacity-0">
+                    Recibe las fotos elegidas y los comentarios organizados directamente en tu panel de control.
+                    Descarga la selección final con un solo clic y cierra el proyecto en tiempo récord, sin hilos de
+                    mensajes interminables.
+                  </div>
+                </div>
+              </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div class="step-text space-y-4 text-center md:text-left order-2 md:order-1">
-                <div class="text-5xl md:text-6xl font-black text-brand-orange/20 font-molengo">03</div>
-                <h3 class="text-2xl md:text-3xl font-bold tracking-tight text-brand-orange">
-                  Aprobación en tempo récord
-                </h3>
-                <p class="text-gray-400 text-base md:text-lg font-light leading-relaxed max-w-md mx-auto md:mx-0">
-                  Sincroniza las correcciones, sube las nuevas versiones en el mismo hilo y permite que aprueben el
-                  proyecto final con un solo botón. Menos correos, cero malentendidos.
-                </p>
-              </div>
-              <div class="step-mockup flex-1 flex justify-center order-first md:order-last p-6 md:p-10 mb-8 md:mb-0">
-                <div class="relative w-[280px] sm:w-[340px] md:w-[380px] xl:w-[420px] aspect-[16/10]">
-                  <div
-                    class="absolute border-2 border-brand-orange/50 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); bottom: 0; left: 0"></div>
-                  <div
-                    class="absolute border-2 border-brand-orange/40 pointer-events-none z-20"
-                    style="
-                      width: calc(100% + 32px);
-                      height: calc(100% + 32px);
-                      top: 50%;
-                      left: 50%;
-                      transform: translate(-50%, -50%);
-                    "></div>
-                  <div
-                    class="absolute border border-brand-orange/35 pointer-events-none z-20"
-                    style="width: calc(100% + 32px); height: calc(100% + 32px); top: 0; right: 0"></div>
+            <!-- COLUMNA DERECHA: El Visualizador Fijo con Marcos de la App -->
+            <div class="col-span-1 md:col-span-7 w-full relative">
+              <!-- Marcos decorativos -->
+              <div
+                class="absolute border border-brand-orange/20 pointer-events-none rounded-xl"
+                style="width: calc(100% + 20px); height: calc(100% + 20px); top: -10px; left: -10px"></div>
+              <div
+                class="absolute border border-brand-orange/10 pointer-events-none rounded-xl"
+                style="width: calc(100% + 40px); height: calc(100% + 40px); top: -20px; left: -20px"></div>
 
-                  <div
-                    class="relative w-full h-full bg-[#0d1a1f] border border-gray-800 shadow-2xl z-10 overflow-hidden">
+              <!-- Ventana de Navegador Mockup -->
+              <div
+                class="relative w-full aspect-[16/10] bg-[#0d1a1f] border border-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col z-10">
+                <!-- Barra superior Mac-style -->
+                <div class="bg-[#112026] px-4 py-3 flex items-center gap-2 border-b border-gray-900/60 flex-shrink-0">
+                  <div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/40"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
+                  <div class="text-[10px] text-gray-500 font-mono ml-4 tracking-wider uppercase">
+                    Phocusync // Preview
+                  </div>
+                </div>
+
+                <!-- Contenedor de Imágenes del Zoom -->
+                <div class="relative w-full h-full flex-grow bg-[#091317] overflow-hidden">
+                  <!-- Zoom 1 (Visible por defecto) -->
+                  <div class="tab-img absolute inset-0 w-full h-full opacity-100 scale-100 pointer-events-auto">
                     <img
-                      src="assets/images/paso3.webp"
-                      alt="Proyecto aprobado con éxito"
-                      class="w-full h-full object-cover block" />
+                      src="assets/images/paso1.png"
+                      alt="Detalle de carga"
+                      class="w-full h-full object-cover object-center" />
+                  </div>
+                  <!-- Zoom 2 -->
+                  <div class="tab-img absolute inset-0 w-full h-full opacity-0 scale-95 pointer-events-none">
+                    <img
+                      src="assets/images/paso2.png"
+                      alt="Detalle feedback"
+                      class="w-full h-full object-cover object-center" />
+                  </div>
+                  <!-- Zoom 3 -->
+                  <div class="tab-img absolute inset-0 w-full h-full opacity-0 scale-95 pointer-events-none">
+                    <img
+                      src="assets/images/paso3.png"
+                      alt="Detalle aprobación"
+                      class="w-full h-full object-cover object-center" />
                   </div>
                 </div>
               </div>
@@ -752,7 +751,7 @@
               </p>
 
               <a
-                href="#register"
+                href="/login"
                 class="cta-button inline-block bg-brand-orange text-white font-sans font-medium text-sm tracking-widest uppercase px-8 py-4 transition-all duration-300 hover:bg-white hover:text-[#0d1a1f] transform hover:-translate-y-0.5 active:translate-y-0">
                 Comienza Gratis Hoy
               </a>

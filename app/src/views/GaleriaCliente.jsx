@@ -1,3 +1,11 @@
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Componente: GaleriaCliente.jsx                                            */
+/* Descripción: Vista pública interactiva para el cliente final.             */
+/*              Orquesta la preselección de favoritos, gestión de notas      */
+/*              de retoque y descargas por lote protegidas.                  */
+/* ========================================================================= */
+
 import React from "react";
 import useGaleriaCliente from "../hooks/useGaleriaCliente";
 import AvisoNuevasFotos from "../components/GaleriaCliente/AvisoNuevasFotos";
@@ -11,10 +19,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useDescargarSeleccion } from "../hooks/useDescargaSeleccion";
 
 export default function GaleriaCliente() {
+  // ABSTRACCIÓN DE LÓGICA COGNITIVA: Se extrae todo el estado y los listeners
+  // a un hook personalizado, aislando la lógica de negocio de la UI.
   const {
     proyecto,
     fotos,
-    perfilFotografo, // Lo mantenemos solo para firmas, créditos y redes en el footer
+    perfilFotografo,
     loading,
     currentIndex,
     comentarioLocal,
@@ -42,13 +52,15 @@ export default function GaleriaCliente() {
     alerta,
   } = useGaleriaCliente();
 
-  // Inicializamos el hook de descarga por lote
+  // GANCHO DE SERVICIO ASÍNCRONO: Orquesta la preparación de los archivos blob en memoria
   const { descargando, progreso, ejecutarDescargaLote } = useDescargarSeleccion();
 
+  // CLÁUSULA DE SALVAGUARDA 1: Estado de carga global (Bloqueante inicial)
   if (loading) {
     return <LoaderCargando mensaje="Cargando tu galería privada..." />;
   }
 
+  // CLÁUSULA DE SALVAGUARDA 2: Control de consistencia en caso de URLs inválidas o sin contenido
   if (!proyecto || fotos.length === 0) {
     return (
       <div className="min-h-screen bg-[#061115] flex items-center justify-center text-gray-500 text-xs font-light">
@@ -58,11 +70,13 @@ export default function GaleriaCliente() {
   }
 
   return (
+    // CONTENEDOR ENTORNO APLICACIÓN: Control rígido del viewport ('h-screen overflow-hidden')
+    // para emular el comportamiento de una herramienta SPA de escritorio.
     <div className="w-full h-screen bg-[#061115] text-[#e2e8f0] font-sans flex flex-col overflow-hidden relative">
-      {/* Cartelito flotante de aviso con auto-cierre */}
+      {/* Notificación persistente con lógica de auto-cierre interna */}
       {avisoNuevasFotos && <AvisoNuevasFotos />}
 
-      {/* HEADER */}
+      {/* CABECERA CONTEXTUAL */}
       <HeaderGaleria
         proyecto={proyecto}
         favoritasCount={favoritas.length}
@@ -72,7 +86,8 @@ export default function GaleriaCliente() {
         abrirPreguntaEnvio={abrirPreguntaEnvio}
       />
 
-      {/* BANNER DE DESCARGA COMPRIMIDA (.ZIP) */}
+      {/* BANNER DINÁMICO DE COMPRESIÓN MULTIMEDIA (.ZIP) */}
+      {/* Condicionado por la configuración de privilegios del proyecto administrada desde Supabase */}
       <AnimatePresence>
         {proyecto?.permitir_descarga && favoritas.length > 0 && (
           <motion.div
@@ -104,9 +119,10 @@ export default function GaleriaCliente() {
         )}
       </AnimatePresence>
 
-      {/* CONTENIDO */}
+      {/* ÁREA DE TRABAJO SPLIT: Divide el espacio en dos columnas adaptables según dispositivo (Móvil vs Desktop) */}
       <div className="w-full flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
-        {/* CONTENEDOR GENERAL DE LA IZQUIERDA (CARRUSEL COMPLETO) */}
+        {/* COLUMNA 1: ESPACIO DE VISUALIZACIÓN MULTIMEDIA (CARRUSEL PRINCIPAL) */}
+        {/* Implementa inyección dinámica de marcas de agua según directivas comerciales */}
         <VisorFotos
           fotoActual={fotoActual}
           currentIndex={currentIndex}
@@ -119,21 +135,26 @@ export default function GaleriaCliente() {
           perfilFotografo={perfilFotografo}
           textoMarcaAgua={perfilFotografo?.marca_agua || perfilFotografo?.nombre_estudio || "PhocuSync"}
           forzar_marca_agua={proyecto?.forzar_marca_agua}
+          permitirDescarga={proyecto?.permitir_descarga}
+          esFavorita={esFavorita}
         />
 
-        {/* PANEL LATERAL */}
-        <PanelLateral
-          fotoActual={fotoActual}
-          seleccionGuardada={seleccionGuardada}
-          esFavorita={esFavorita}
-          handleToggleFavorita={handleToggleFavorita}
-          comentarioLocal={comentarioLocal}
-          setComentarioLocal={setComentarioLocal}
-          guardarComentarioEnBD={guardarComentarioEnBD}
-        />
+        {/* COLUMNA 2: CONSOLA DE INTERACCIÓN LATERAL */}
+        {/* Concentra los triggers para mutar favoritos y despachar strings de comentarios */}
+        {!proyecto?.permitir_descarga && (
+          <PanelLateral
+            fotoActual={fotoActual}
+            seleccionGuardada={seleccionGuardada}
+            esFavorita={esFavorita}
+            handleToggleFavorita={handleToggleFavorita}
+            comentarioLocal={comentarioLocal}
+            setComentarioLocal={setComentarioLocal}
+            guardarComentarioEnBD={guardarComentarioEnBD}
+          />
+        )}
       </div>
 
-      {/* FOOTER GLOBAL */}
+      {/* FOOTER CORPORATIVO/CRÉDITOS */}
       <footer className="w-full py-4 border-t border-white/5 bg-[#040b0d] flex flex-col sm:flex-row items-center justify-between px-6 md:px-10 gap-2 shrink-0 z-10">
         <p className="text-[10px] uppercase tracking-widest text-gray-500 font-light">
           {perfilFotografo?.marca_agua || `© ${perfilFotografo?.nombre_estudio || "PhocuSync"} 2026`}
@@ -150,7 +171,7 @@ export default function GaleriaCliente() {
         )}
       </footer>
 
-      {/* MODALES Y CAPAS DE CARGA */}
+      {/* CAPA DE MODALES Y COMPONENTES TRANSITORIOS */}
       <ModalExito mostrar={mostrarExitoCliente} onClose={() => setMostrarExitoCliente(false)} />
 
       <ModalConfirmacion
@@ -160,6 +181,7 @@ export default function GaleriaCliente() {
         onConfirm={handleEnviarSeleccion}
       />
 
+      {/* OVERLAY DE PERSISTENCIA: Bloquea interacciones mientras los datos viajan a Supabase */}
       {enviandoDatos && (
         <LoaderCargando
           mensaje="Enviando selección..."
@@ -168,7 +190,7 @@ export default function GaleriaCliente() {
         />
       )}
 
-      {/* ALERTAS GENERALES */}
+      {/* TOAST SYSTEM: Alertas flotantes controladas por estado global */}
       <AnimatePresence>
         {alerta.mostrar && (
           <motion.div

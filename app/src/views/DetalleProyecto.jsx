@@ -7,6 +7,7 @@ import UploadZone from "../components/DetalleProyecto/UploadZone";
 import ControlesCarrete from "../components/DetalleProyecto/ControlesCarrete";
 import FotoGrid from "../components/DetalleProyecto/FotoGrid";
 import ModalesProyecto from "../components/DetalleProyecto/ModalesProyecto";
+import LoaderCargando from "../components/GaleriaCliente/LoaderCargando";
 
 export default function DetalleProyecto() {
   const { id } = useParams();
@@ -29,11 +30,11 @@ export default function DetalleProyecto() {
 
   if (state.loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0c1f27] backdrop-blur-md p-4">
-        <p className="text-[18px] uppercase font-bold tracking-widest text-gray-200 font-mono">
-          Cargando tu galería...
-        </p>
-      </div>
+      <LoaderCargando
+        mensaje="Cargando tu galería..."
+        submensaje="Preparando tus fotografías y optimizando la visualización."
+        isOverlay={false}
+      />
     );
   }
 
@@ -41,7 +42,6 @@ export default function DetalleProyecto() {
     <div className="min-h-screen bg-[#061115] text-[#e2e8f0] font-sans p-6 md:p-10 space-y-10">
       <HeaderProyecto
         proyecto={state.proyecto}
-        navigate={navigate}
         setModalEliminarProyecto={actions.setModalEliminarProyecto}
         setModalCompartir={actions.setModalCompartir}
       />

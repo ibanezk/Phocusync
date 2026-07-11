@@ -1,5 +1,18 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Componente: App.jsx (Enrutador Maestro)                                   */
+/* Descripción: Definición de la arquitectura de navegación del sistema.    */
+/*              Divide los entornos públicos, los espacios de trabajo       */
+/*              con barra de control fija y los lienzos de pantalla completa*/
+/* ========================================================================= */
+
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
+// Layouts y Contenedores estructurales
 import DashboardLayout from "./components/Dashboard/DashboardLayout";
+
+// Vistas de la Aplicación
 import Login from "./views/Login";
 import Dashboard from "./views/Dashboard";
 import DetalleProyecto from "./views/DetalleProyecto";
@@ -11,19 +24,22 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Ruta pública */}
-        <Route path="/" element={<Login />} />
+        {/* ================= PUBLIC ROUTES ================= */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        {/* Ahora coincide perfectamente con la redirección de la landing */}
+        <Route path="/login" element={<Login />} />
 
-        {/* 🔒 Rutas privadas con Sidebar fijo */}
+        {/* ================= PRIVATE WORKSPACE (With Sidebar) ================= */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="galerias" element={<PanelGalerias />} />
           <Route path="ajustes" element={<Ajustes />} />
         </Route>
 
-        {/* 🔓 Pantalla completa (SIN Sidebar) */}
-        {/* 🎯 Mantenemos la ruta completa para que useDashboard no rompa */}
+        {/* ================= FULLSCREEN CANVAS (No Sidebar) ================= */}
         <Route path="/dashboard/proyecto/:id" element={<DetalleProyecto />} />
+
+        {/* Portal de Cara al Cliente Final */}
         <Route path="/galeria/:id" element={<GaleriaCliente />} />
       </Routes>
     </Router>

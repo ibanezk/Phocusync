@@ -1,33 +1,47 @@
+// =========================================================================
+// Proyecto: PhocuSync SaaS Landing Page
+// Nombre del Archivo: script.js / animations.js
+// Propósito: Motor de interactividad, animaciones de entrada y optimizaciones de rendimiento.
+// Arquitectura: GSAP v3 (GreenSock) Core + ScrollTrigger Plugin.
+// Versión: 1.0.0 (Fase de Lanzamiento)
+// =========================================================================
+
+// Registro obligatorio del plugin ScrollTrigger para habilitar animaciones basadas en el scroll
 gsap.registerPlugin(ScrollTrigger);
 
-// ============================================================
-// 1. OPTIMIZACIONES GENERALES (imágenes lazy, will-change)
-// ============================================================
+// =========================================================================
+// 1. OPTIMIZACIONES DE RENDIMIENTO NATIVAS (Browser Paint Thread Optimization)
+// =========================================================================
+
+// Inyección dinámica de atributos de rendimiento para mitigar el bloqueo del hilo principal (Main Thread)
 document.querySelectorAll("img").forEach((img) => {
+  // Asegura la carga diferida nativa si no se declaró explícitamente en el HTML
   if (!img.hasAttribute("loading")) img.setAttribute("loading", "lazy");
+  // Decodificación asíncrona para evitar tirones de renderizado al hacer scroll rápido
   if (!img.hasAttribute("decoding")) img.setAttribute("decoding", "async");
 });
 
-// Añadir will-change a elementos animados (mejora fluidez)
+// Promoción de capas en la GPU (Hardware Acceleration) para elementos con transiciones complejas.
+// Esto reduce los costos de 'Paint' y 'Layout' redistribuyendo el esfuerzo al procesador gráfico.
 const animatedElements = document.querySelectorAll(
-  ".animate-on-load, .frame, #heroTitle, #imageContainer, .nav-item, #contactBtn, #heroButton, #heroParagraph",
+  ".animate-on-load, .frame, #imageContainer, .nav-item, #contactBtn, #heroButton, #heroParagraph",
 );
 animatedElements.forEach((el) => (el.style.willChange = "transform, opacity"));
 
-// ============================================================
-// 2. FUNCIÓN DE ANIMACIÓN DEL HERO
-// ============================================================
+// =========================================================================
+// 2. FUNCIÓN ORQUESTADORA: ANIMACIÓN DEL HERO
+// =========================================================================
 function startHeroAnimation() {
-  // Asegurar visibilidad por si algún elemento quedó oculto
+  // Previene el efecto FOUC (Flash of Unstyled Content) forzando la opacidad base
   const menuContainer = document.getElementById("menuContainer");
   if (menuContainer) menuContainer.style.opacity = "1";
   document.querySelectorAll(".animate-on-load").forEach((el) => (el.style.opacity = "1"));
 
+  // Instancia de la línea de tiempo principal para secuenciar de forma síncrona
   const tl = gsap.timeline();
 
-  // Todas tus animaciones originales (título, imagen, logo, nav-item cayendo, etc.)
-  tl.from("#heroTitle", { x: -50, opacity: 0, duration: 0.6, ease: "power2.out" })
-    .from("#imageContainer", { x: 80, opacity: 0, duration: 0.7, ease: "power3.out" }, "-=0.3")
+  // Orquestación secuencial mediante offsets relativos ("-=0.X") para solapamientos fluidos
+  tl.from("#imageContainer", { x: 80, opacity: 0, duration: 0.7, ease: "power3.out" }, "-=0.3")
     .from("#logoIcon", { scale: 0, duration: 0.4, ease: "back.out(1.2)" }, "-=0.2")
     .from(".nav-item", { y: -20, opacity: 0, stagger: 0.1, duration: 0.4, ease: "power2.out" }, "-=0.2")
     .from("#contactBtn", { scale: 0.8, duration: 0.4, ease: "elastic.out(1, 0.5)" }, "-=0.2")
@@ -36,49 +50,60 @@ function startHeroAnimation() {
     .from(".frame", { opacity: 0, stagger: 0.1, duration: 0.4, ease: "power2.out" }, "-=0.4");
 }
 
-// ============================================================
-// 3. LOADER: ESPERAR A QUE LA IMAGEN DEL HERO ESTÉ LISTA
-// ============================================================
+// =========================================================================
+// 3. INTEGRACIÓN DEL PAGE LOADER (Lifecycle Assets Synchronization)
+// =========================================================================
 const heroImage = document.querySelector("#imageContainer img");
 const loader = document.getElementById("page-loader");
 
+/**
+ * Gestiona la transición de salida del Loader y dispara la línea de tiempo del Hero
+ */
 function hideLoaderAndStart() {
   if (!loader) {
     startHeroAnimation();
     return;
   }
-  // Desvanecer loader
+  // Suavizado visual mediante transición CSS de opacidad
   loader.style.opacity = "0";
-  // Esperar a que termine la transición y luego ocultarlo del DOM y animar
+
+  // Retraso controlado para remover el loader del flujo del DOM tras culminar la transición
   setTimeout(() => {
     loader.style.display = "none";
     startHeroAnimation();
   }, 500);
 }
 
-// Si la imagen ya está cargada, esperamos un poco por si acaso, luego ocultamos loader
+// Validación de caché de imágenes: Si la imagen ya fue procesada, arranca inmediatamente
 if (heroImage && heroImage.complete) {
   setTimeout(hideLoaderAndStart, 100);
 } else if (heroImage) {
+  // Enlace a listeners nativos para flujos asíncronos lentos o fallas de red
   heroImage.onload = hideLoaderAndStart;
-  heroImage.onerror = hideLoaderAndStart; // si falla, también ocultamos
+  heroImage.onerror = hideLoaderAndStart;
 } else {
-  // Si no hay imagen, ocultamos loader directamente
+  // Cláusula de salvaguarda por si el layout cambia estructuralmente
   hideLoaderAndStart();
 }
 
-// ============================================================
-// 4. MENÚ MÓVIL CON GSAP (sin cambios)
-// ============================================================
+// =========================================================================
+// 4. CONTROLADOR DEL MENÚ MÓVIL DESPLEGABLE (Modal State Management)
+// =========================================================================
 const menuBtn = document.getElementById("menuBtn");
 const closeMenuBtn = document.getElementById("closeMenuBtn");
 const mobileMenu = document.getElementById("mobileMenu");
-let menuTimeline = null;
+let menuTimeline = null; // Almacena la referencia de la línea de tiempo activa para evitar colisiones de hilos
 
+/**
+ * Abre el portal móvil aplicando animaciones escalonadas (stagger) de entrada
+ */
 function openMobileMenu() {
-  if (menuTimeline) menuTimeline.kill();
+  if (menuTimeline) menuTimeline.kill(); // Mata cualquier proceso residual activo
   document.body.classList.add("menu-open");
+
+  // Inicialización de propiedades espaciales seguras en el DOM
   gsap.set(mobileMenu, { visibility: "visible", display: "flex" });
+
   menuTimeline = gsap
     .timeline()
     .fromTo(mobileMenu, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" })
@@ -89,90 +114,93 @@ function openMobileMenu() {
       { opacity: 1, y: 0, stagger: 0.08, duration: 0.4, ease: "power2.out" },
       "-=0.2",
     );
+
+  // Bloqueo estricto del scroll nativo de fondo por accesibilidad y UX (Layout Locking)
   document.body.style.overflow = "hidden";
 }
 
+/**
+ * Cierra el menú revirtiendo los valores hacia coordenadas seguras fuera del Viewport
+ */
 function closeMobileMenu() {
   if (menuTimeline) menuTimeline.kill();
+
   menuTimeline = gsap.timeline({
     onComplete: () => {
+      // Callback de limpieza absoluta al finalizar el timeline
       gsap.set(mobileMenu, { visibility: "hidden", display: "none" });
       document.body.style.overflow = "";
       document.body.classList.remove("menu-open");
     },
   });
+
   menuTimeline
     .to(".mobile-nav-link", { opacity: 0, y: 30, stagger: 0.05, duration: 0.2, ease: "power2.in" })
     .to(".mobile-menu-content", { x: "100%", duration: 0.3, ease: "power2.in" }, "-=0.1")
     .to(mobileMenu, { opacity: 0, duration: 0.3, ease: "power2.in" }, "-=0.2");
 }
 
+// Vinculación de Event Listeners seguros
 if (menuBtn) menuBtn.addEventListener("click", openMobileMenu);
 if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMobileMenu);
 document.querySelectorAll(".mobile-nav-link").forEach((link) => link.addEventListener("click", closeMobileMenu));
 
-// ============================================================
-// 5. ANIMACIÓN BUCLE INFINITO
-// ============================================================
-
+// =========================================================================
+// 5. ANIMACIÓN BUCLE INFINITO (Ticker / Marquee de Integraciones)
+// =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  // Aseguramos que Google Fonts se haya renderizado por completo antes de medir
+  // Sincronización con el render de fuentes para evitar mediciones erróneas de anchura en pixeles (Layout Thrashing)
   document.fonts.ready.then(() => {
     const marqueeContent = document.getElementById("marqueeContent");
     const firstTrack = document.querySelectorAll(".marquee-track")[0];
 
-    // Medimos el ancho exacto de una sola pista (el bloque de palabras completo)
+    // Obtención métrica exacta del bounding-box de un bloque para el cálculo del bucle
     const trackWidth = firstTrack.getBoundingClientRect().width;
 
-    // Animación fluida con GSAP Modifiers para un bucle infinito real
+    // Lógica matemática mediante modificadores dinámicos.
+    // Mueve el contenedor horizontalmente y aplica una operación módulo (%) en tiempo real,
+    // permitiendo un loop infinito perfecto, libre de saltos visuales o desfases.
     gsap.to(marqueeContent, {
       x: -trackWidth,
-      duration: 15, // Más segundos = más lento y elegante
+      duration: 15, // Factor de velocidad: a mayor tiempo, mayor elegancia editorial
       ease: "none",
       repeat: -1,
       modifiers: {
-        // Esta función hace que cuando el contenedor se desplace el ancho de una pista,
-        // vuelva a 0 instantáneamente sin saltos ópticos
         x: gsap.utils.unitize((x) => parseFloat(x) % trackWidth),
       },
     });
   });
 });
 
-// ============================================================
-// 6. ANIMACIÓN DE TARJETAS CON SCROLLTRIGGER (Sincronización estricta)
-// ============================================================
-
+// =========================================================================
+// 6. GRID ASIMÉTRICO DE BENEFICIOS (GPU-Pre-decoding & ScrollTrigger)
+// =========================================================================
 const cardsContainer = document.querySelector(".grid");
 const cards = document.querySelectorAll(".flex.flex-col.gap-2");
 
 if (cardsContainer && cards.length) {
-  // 1. Ocultamos las tarjetas inmediatamente con GSAP para evitar parpadeos
+  // Estado inicial oculto controlado por JS para evitar saltos estéticos bruscos (Flicker)
   gsap.set(cards, { opacity: 0, y: 30 });
 
-  // 2. Seleccionamos solo las imágenes dentro de las tarjetas asimétricas
   const bentoImages = Array.from(cardsContainer.querySelectorAll("img"));
 
-  // 3. Forzamos a la GPU a decodificarlas en bloque ANTES de crear el ScrollTrigger
+  // API Avanzada Promisificada: Fuerza la descompresión y decodificación de las imágenes en la GPU
+  // ANTES de calcular las zonas calientes del scroll, garantizando que el trigger sea 100% preciso.
   Promise.all(
     bentoImages.map((img) => {
-      // img.decode() es una API moderna que procesa la imagen de forma asíncrona
-      // y resuelve la promesa solo cuando está 100% lista para ser pintada al instante.
       return img.decode().catch(() => {
-        // Capturamos cualquier error silencioso para que la animación no se rompa
-        console.warn("Una imagen del grid tardó en decodificarse");
+        console.warn("Decodificación asíncrona de imagen mitigada de forma segura.");
       });
     }),
   ).then(() => {
-    // 4. UNA VEZ TODAS ESTÁN LISTAS, inicializamos la animación
+    // Inicialización del disparador una vez resuelto el hilo de imágenes
     gsap.to(cards, {
       scrollTrigger: {
         trigger: cardsContainer,
         start: "top 80%",
-        once: true,
+        once: true, // Optimización: Destruye el listener tras ejecutarse una vez (Un-mount manual)
         toggleActions: "play none none none",
         invalidateOnRefresh: false,
-        markers: false,
       },
       opacity: 1,
       y: 0,
@@ -182,79 +210,92 @@ if (cardsContainer && cards.length) {
   });
 }
 
-// ============================================================
-// 7. ANIMACIÓN SECCIÓN CÓMO FUNCIONA
-// ============================================================
-
-// Esperamos a que cargue el DOM
+// =========================================================================
+// 7. COMPONENTE INTERACTIVO: CÓMO FUNCIONA (Tabs Lifecycle & Crossfades)
+// =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  // Seleccionamos todas las filas de los pasos
-  const steps = document.querySelectorAll("#how-it-works .grid");
+  const tabs = document.querySelectorAll(".tab-btn");
+  const images = document.querySelectorAll(".tab-img");
+  let currentIndex = 0; // Puntero de estado global del componente
 
-  steps.forEach((step, index) => {
-    const text = step.querySelector(".step-text");
-    const mockup = step.querySelector(".step-mockup");
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+      // Cláusula de escape si el usuario presiona la pestaña activa en pantalla
+      if (index === currentIndex) return;
 
-    // Determinamos la dirección según el índice (Paso 1 y 3 entran diferente al Paso 2)
-    // Si index es impar (Paso 2), el texto viene de la derecha (x: 100) y mockup de la izquierda (x: -100)
-    const isEven = index % 2 === 0;
-    const textFromX = isEven ? -60 : 60;
-    const mockupFromX = isEven ? 60 : -60;
-    const rotationFrom = isEven ? 4 : -4; // Rotación sutil inicial para el mockup
+      const previousTab = tabs[currentIndex];
+      const currentTab = tab;
 
-    // Creación de la línea de tiempo de GSAP vinculada al scroll de esta fila
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: step,
-        start: "top 80%", // La animación arranca cuando el tope de la fila llega al 80% del alto de la pantalla
-        end: "top 50%", // Termina de ejecutarse al llegar al 50%
-        toggleActions: "play none none reverse", // Se reproduce al bajar, se revierte de forma fluida si suben
-      },
-    });
+      // --- FASE 1: MUTACIÓN DE SALIDA (Limpieza de Estados de Marca) ---
+      previousTab.classList.add("opacity-40", "border-transparent");
+      previousTab.classList.remove("bg-[#0d1a1f]", "border-gray-800", "shadow-xl");
+      previousTab.querySelector(".tab-number").classList.replace("text-brand-orange", "text-gray-500");
+      previousTab.querySelector(".tab-title").classList.replace("text-white", "text-gray-400");
 
-    // Animación del bloque de Texto
-    tl.from(
-      text,
-      {
+      // Colapso dinámico de altura mediante interpolación lineal de GSAP
+      gsap.to(previousTab.querySelector(".tab-desc"), {
+        height: 0,
         opacity: 0,
-        x: textFromX,
-        duration: 1,
+        marginTop: 0,
+        duration: 0.3,
         ease: "power2.out",
-      },
-      0,
-    ); // El ', 0' hace que corran al mismo tiempo
+      });
+      gsap.to(previousTab.querySelector(".tab-border"), { opacity: 0, duration: 0.3 });
 
-    // Animación del bloque Mockup (Con un ligero efecto 3D rotativo de entrada)
-    tl.from(
-      mockup,
-      {
+      // Desvanecimiento cruzado y desactivación del puntero del frame saliente
+      gsap.to(images[currentIndex], {
         opacity: 0,
-        x: mockupFromX,
-        rotation: rotationFrom,
         scale: 0.95,
-        duration: 1.2,
-        ease: "power3.out",
-      },
-      0,
-    );
+        duration: 0.4,
+        ease: "power2.inOut",
+        pointerEvents: "none",
+      });
+
+      // --- FASE 2: MUTACIÓN DE ENTRADA (Activación del nuevo nodo) ---
+      currentIndex = index; // Sincronización del puntero de control
+
+      currentTab.classList.remove("opacity-40", "border-transparent");
+      currentTab.classList.add("bg-[#0d1a1f]", "border-gray-800", "shadow-xl");
+      currentTab.querySelector(".tab-number").classList.replace("text-gray-500", "text-brand-orange");
+      currentTab.querySelector(".tab-title").classList.replace("text-gray-400", "text-white");
+
+      // Expansión fluida basada en cálculo dinámico de altura ("auto")
+      gsap.to(currentTab.querySelector(".tab-desc"), {
+        height: "auto",
+        opacity: 1,
+        marginTop: 8,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+      gsap.to(currentTab.querySelector(".tab-border"), { opacity: 1, duration: 0.3 });
+
+      // Zoom in y activación del canal interactivo de la imagen seleccionada
+      gsap.to(images[currentIndex], {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        ease: "power2.inOut",
+        pointerEvents: "auto",
+      });
+    });
   });
 });
 
-// ============================================================
-// 8. ANIMACIÓN SECCIÓN PRECIOS
-// ============================================================
+// =========================================================================
+// 8. SECCIÓN DE PRECIOS (Scroll Orchestration & Focus/Blur Effects)
+// =========================================================================
 
-// 1. Animación de entrada con ScrollTrigger
+// Línea de tiempo enlazada al ScrollTrigger de la sección completa
 const pricingTimeline = gsap.timeline({
   scrollTrigger: {
     trigger: "#pricing",
-    start: "top 75%", // Se activa cuando la parte superior de la sección llega al 75% del viewport
-    toggleActions: "play none none reverse",
+    start: "top 75%",
+    toggleActions: "play none none reverse", // Revierte elegantemente si el usuario hace scroll hacia arriba
   },
 });
 
 pricingTimeline
-  // Aparece el título y su línea decorativa primero
+  // Entrada tipográfica inicial
   .from("#pricing h2, #pricing .w-14", {
     y: 30,
     opacity: 0,
@@ -262,7 +303,7 @@ pricingTimeline
     stagger: 0.1,
     ease: "power2.out",
   })
-  // Entran las tarjetas en cascada (stagger) de izquierda a derecha
+  // Entrada en cascada desfasada de las tarjetas comerciales
   .from(
     ".pricing-card",
     {
@@ -273,8 +314,8 @@ pricingTimeline
       ease: "power3.out",
     },
     "-=0.3",
-  ) // Se solapa un poco con la animación del título para mayor fluidez
-  // Por último, aparecen los 3 puntitos de paginación de golpe
+  )
+  // Entrada sutil de los elementos estéticos indicadores
   .from(
     "#pricing .flex.justify-center.items-center.gap-3",
     {
@@ -286,25 +327,20 @@ pricingTimeline
     "-=0.2",
   );
 
-// ==================== INTERACCIÓN HOVER EN LAS TARJETAS ====================
-
-// Seleccionamos todas las tarjetas de precios
+// --- INTERACCIONES DE MICROMOVIMIENTO (Hover States Mechanics) ---
 const pricingCards = document.querySelectorAll(".pricing-card");
 
 pricingCards.forEach((card) => {
-  // Buscamos el botón interno
   const button = card.querySelector("button");
-  if (!button) return; // Seguridad por si acaso
+  if (!button) return;
 
-  // Creamos una animación individual para el hover de cada tarjeta
   const hoverAnimation = gsap.timeline({ paused: true });
 
-  // Verificamos si esta tarjeta es la Pro (buscando si su fondo es el oscuro destacado #132830)
-  // O si prefieres puedes ponerle una clase única en el HTML como 'card-pro'
+  // Discriminador semántico seguro: Detecta si es la tarjeta premium (Pro Studio) mediante strings en el DOM
   const isFeatured = card.getBoundingClientRect().width > 0 && card.innerHTML.includes("Pro Studio");
 
   if (isFeatured) {
-    // Si es la central (Pro Studio), solo la elevamos un extra y aumentamos su brillo
+    // Escala y brillo prioritarios para la opción destacada
     hoverAnimation.to(card, {
       y: -12,
       borderColor: "rgba(255, 107, 0, 1)",
@@ -313,7 +349,7 @@ pricingCards.forEach((card) => {
       ease: "power2.out",
     });
   } else {
-    // Si son las laterales, suben desde su posición plana y su borde se ilumina levemente
+    // Elevación estándar para tarjetas base
     hoverAnimation.to(card, {
       y: -10,
       borderColor: "rgba(255, 107, 0, 0.4)",
@@ -323,30 +359,18 @@ pricingCards.forEach((card) => {
     });
   }
 
-  // Animación para el botón interno
-  hoverAnimation.to(
-    button,
-    {
-      scale: 1.02,
-      duration: 0.2,
-      ease: "power1.out",
-    },
-    0,
-  );
+  // Escala sutil del botón interno (Micro-feedback)
+  hoverAnimation.to(button, { scale: 1.02, duration: 0.2, ease: "power1.out" }, 0);
 
-  // EVENTOS DEL MOUSE
+  // Eventos de Mouse con control de opacidades cruzadas para jerarquía visual profunda
   card.addEventListener("mouseenter", () => {
     hoverAnimation.play();
 
-    // EFECTO DE JERARQUÍA SEGURO: Buscamos la tarjeta Pro Studio usando texto, sin selectores raros
+    // Si el usuario enfoca una tarjeta lateral, atenúa sutilmente la tarjeta central destacada (Focus Effect)
     if (!isFeatured) {
       pricingCards.forEach((c) => {
         if (c.innerHTML.includes("Pro Studio")) {
-          gsap.to(c, {
-            opacity: 0.65,
-            scale: 0.98,
-            duration: 0.3,
-          });
+          gsap.to(c, { opacity: 0.65, scale: 0.98, duration: 0.3 });
         }
       });
     }
@@ -355,49 +379,42 @@ pricingCards.forEach((card) => {
   card.addEventListener("mouseleave", () => {
     hoverAnimation.reverse();
 
-    // Restauramos la tarjeta central de forma segura
+    // Restauración inmediata del balance estético original (Blur rollback)
     if (!isFeatured) {
       pricingCards.forEach((c) => {
         if (c.innerHTML.includes("Pro Studio")) {
-          gsap.to(c, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.3,
-          });
+          gsap.to(c, { opacity: 1, scale: 1, duration: 0.3 });
         }
       });
     }
   });
 });
 
-// ============================================================
-// 9. ANIMACIÓN SECCIÓN TESTIMONIOS
-// ============================================================
-
+// =========================================================================
+// 9. SECCIÓN DE TESTIMONIOS (Staggered Entrance Trigger)
+// =========================================================================
 gsap.from(".testimonial-card", {
   scrollTrigger: {
     trigger: "#testimonials",
-    start: "top 80%", // Se dispara un poco antes para que la transición sea suave
+    start: "top 80%",
     toggleActions: "play none none reverse",
   },
   y: 35,
   opacity: 0,
   duration: 0.8,
-  stagger: 0.15, // Aparecen una tras otra de izquierda a derecha
+  stagger: 0.15, // Desfase rítmico de izquierda a derecha (Efecto oleada)
   ease: "power2.out",
 });
 
-// ============================================================
-// 10. ANIMACIÓN SECCIÓN CTA
-// ============================================================
+// =========================================================================
+// 10. BLOQUE FINAL DE LLAMADO A LA ACCIÓN (Parallax Geométrico Interactivo)
+// =========================================================================
 
-// ==================== ANIMACIÓN DE ENTRADA (SCROLLTRIGGER) ====================
-
-// 1. Entrada de la caja principal
+// Animación de entrada por scroll del contenedor estructural
 gsap.from(".cta-container", {
   scrollTrigger: {
     trigger: "#final-cta",
-    start: "top bottom", // Se dispara apenas entra a la vista
+    start: "top bottom",
     toggleActions: "play none none reverse",
   },
   y: 40,
@@ -406,14 +423,10 @@ gsap.from(".cta-container", {
   ease: "power3.out",
 });
 
-// 2. Entrada de las formas geométricas
-// Entrada de las formas geométricas obligando el estado final
+// Inicialización controlada de las capas vectoriales internas de fondo (SVG Shapes)
 gsap.fromTo(
   ".cta-shape",
-  {
-    opacity: 0,
-    scale: 0.8,
-  }, // Estado Inicial
+  { opacity: 0, scale: 0.8 },
   {
     opacity: 1,
     scale: 1,
@@ -423,25 +436,27 @@ gsap.fromTo(
     ease: "power2.out",
     scrollTrigger: {
       trigger: "#final-cta",
-      start: "top 90%", // Se dispara apenas asoma la sección
+      start: "top 90%",
       toggleActions: "play none none reverse",
     },
-  }, // Estado Final
+  },
 );
 
-// ==================== INTERACCIÓN GEOMÉTRICA CON EL MOUSE ====================
+// --- CÁLCULO DE VECTORES DE PROFUNDIDAD (Mousemove Parallax Effect) ---
 const ctaContainer = document.querySelector(".cta-container");
 const ctaShapes = document.querySelectorAll(".cta-shape");
 
 if (ctaContainer && ctaShapes.length > 0) {
   ctaContainer.addEventListener("mousemove", (e) => {
+    // Mapeo perimetral del contenedor relativo al viewport global
     const { left, top, width, height } = ctaContainer.getBoundingClientRect();
 
-    // Posición del mouse relativa al centro (-0.5 a 0.5)
+    // Normalización de coordenadas del cursor en un rango cartesiano (-0.5 a 0.5)
     const x = (e.clientX - left) / width - 0.5;
     const y = (e.clientY - top) / height - 0.5;
 
-    // Movimiento sutil de las líneas (efecto profundidad)
+    // Desplazamiento reactivo asimétrico: Multiplica los vectores por factores indexados
+    // creando una ilusión óptica de tridimensionalidad física (Depth of Field Simulacrum).
     ctaShapes.forEach((shape, index) => {
       const factor = (index + 1) * 15;
       gsap.to(shape, {
@@ -453,34 +468,13 @@ if (ctaContainer && ctaShapes.length > 0) {
     });
   });
 
-  // Resetear al salir el cursor
+  // Reajuste inercial suave al retirar el cursor (Spring-back effect)
   ctaContainer.addEventListener("mouseleave", () => {
     ctaShapes.forEach((shape) => {
-      gsap.to(shape, {
-        x: 0,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-      });
+      gsap.to(shape, { x: 0, y: 0, duration: 0.8, ease: "power3.out" });
     });
   });
 }
 
-// ============================================================
-// 11. ANIMACIÓN FOOTER
-// ============================================================
-
-gsap.from("footer flex", {
-  scrollTrigger: {
-    trigger: "footer",
-    start: "top bottom",
-    toggleActions: "play none none reverse",
-  },
-  opacity: 0,
-  y: 15,
-  duration: 0.6,
-  stagger: 0.1,
-  ease: "power2.out",
-});
-
+// Logs informativos de control para entornos de desarrollo y diagnóstico
 console.log("✅ animations.js cargado y loader integrado");

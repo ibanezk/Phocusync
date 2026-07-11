@@ -1,4 +1,11 @@
-// 📁 src/components/AjustesProyecto/ControlesCarrete.jsx
+/* ========================================================================= */
+/* Proyecto: PhocuSync SaaS Portal                                           */
+/* Componente: ControlesCarrete.jsx                                          */
+/* Descripción: Panel de control unificado para la gestión de la galería.    */
+/*              Administra filtros visuales, estado de selección masiva,     */
+/*              reglas de negocio en tiempo real y exportación de metadatos. */
+/* ========================================================================= */
+
 import React from "react";
 import ToggleDescargas from "./ToggleDescargas";
 
@@ -20,11 +27,13 @@ export default function ControlesCarrete({
   guardandoAjustes,
   actualizarAjuste,
 }) {
+  // ESTRATEGIA DERIVADA: Evalúa si existe al menos una fotografía aprobada por el cliente
   const tieneElegidas = fotos.some((f) => f.seleccionada);
 
   return (
     <div className="w-full bg-[#040b0d]/50 border border-white/5 p-4 md:p-5 rounded-sm flex flex-col gap-5 select-none">
-      {/* ─── FILA 1: ENCABEZADO Y METRICAS ─── */}
+      {/* ─── FILA 1: ENCABEZADO Y MÉTRICAS GLOBALES ─── */}
+      {/* Muestra la relación de ítems filtrados en tiempo real y calcula el peso total en Megabytes */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#ff4d00]" />
@@ -36,10 +45,12 @@ export default function ControlesCarrete({
         </p>
       </div>
 
-      {/* ─── FILA 2: FILTROS DE VISTA (TABS) ─── */}
+      {/* ─── FILA 2: SEGMENTACIÓN DE VISTA (TABS) Y ACCIONES MASIVAS ─── */}
+      {/* Controladores superiores para cambiar el filtro global de la cuadrícula y manejar lotes de borrado */}
       <div className="w-full flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        {/* Selector de Filtros */}
+        {/* Pestañas de Filtrado Reactivo */}
         <div className="bg-[#061115] border border-white/5 p-1 rounded-sm flex gap-1 w-full sm:w-auto overflow-x-auto scrollbar-none">
+          {/* Opción: Mostrar todo el set */}
           <button
             onClick={() => setFiltroElegidas("todas")}
             className={`flex-1 sm:flex-none px-4 py-1.5 rounded-sm text-[11px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${
@@ -47,6 +58,8 @@ export default function ControlesCarrete({
             }`}>
             Todas ({fotos.length})
           </button>
+
+          {/* Opción: Mostrar preselecciones del cliente */}
           <button
             onClick={() => setFiltroElegidas("seleccionadas")}
             className={`flex-1 sm:flex-none px-4 py-1.5 rounded-sm text-[11px] font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
@@ -56,6 +69,8 @@ export default function ControlesCarrete({
             }`}>
             ⭐ Elegidas ({fotos.filter((f) => f.seleccionada).length})
           </button>
+
+          {/* Opción: Mostrar fotos con anotaciones escritas */}
           <button
             onClick={() => setFiltroElegidas("con_nota")}
             className={`flex-1 sm:flex-none px-4 py-1.5 rounded-sm text-[11px] font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
@@ -65,9 +80,10 @@ export default function ControlesCarrete({
           </button>
         </div>
 
-        {/* Acción de Selección Masiva Local (Marcar todo / Cancelar) */}
+        {/* Bloque Contextual de Operaciones en Lote */}
         <div className="w-full sm:w-auto shrink-0">
           {selectedFotos.length > 0 ? (
+            // Interfaz activa cuando hay elementos marcados en el checkbox del grid
             <div className="flex gap-2 w-full justify-end">
               <button
                 onClick={() => setSelectedFotos([])}
@@ -81,6 +97,7 @@ export default function ControlesCarrete({
               </button>
             </div>
           ) : (
+            // Estado por defecto: Permite indexar todos los IDs visibles del filtro actual
             <button
               onClick={() => setSelectedFotos(fotosFiltradas.map((f) => f.id))}
               className="w-full sm:w-auto px-4 h-8 text-[11px] font-bold uppercase tracking-wider text-gray-400 hover:text-white bg-[#061115] border border-white/5 hover:border-white/10 rounded-sm transition-all">
@@ -90,11 +107,12 @@ export default function ControlesCarrete({
         </div>
       </div>
 
-      {/* ─── FILA 3: GRID DE REGLAS Y ACCIONES DE FLUJO ─── */}
+      {/* ─── FILA 3: REGLAS OPERATIVAS Y ACCIÓN DE EXPORTACIÓN ─── */}
+      {/* Controles dinámicos que alteran las columnas de configuración del proyecto en la base de datos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2 border-t border-white/5 w-full">
-        {/* BLOQUE IZQUIERDO: REGLAS DE LA GALERÍA (8 Columnas en Desktop) */}
+        {/* BLOQUE IZQUIERDO: Configuración de Reglas de Negocio (7 Columnas en escritorios) */}
         <div className="lg:col-span-7 xl:col-span-8 flex flex-col sm:flex-row flex-wrap items-center gap-2.5 w-full">
-          {/* Regla 1: Descargas */}
+          {/* Regla 1: Switch de descarga de archivos */}
           <div className="w-full sm:w-auto shrink-0">
             <ToggleDescargas
               permitirDescargas={permitirDescargas}
@@ -103,7 +121,7 @@ export default function ControlesCarrete({
             />
           </div>
 
-          {/* Regla 2: Marca de Agua */}
+          {/* Regla 2: Toggle de protección de Marca de Agua */}
           <button
             onClick={() => actualizarAjuste("forzar_marca_agua", !forzarMarcaAgua)}
             disabled={guardandoAjustes}
@@ -118,7 +136,8 @@ export default function ControlesCarrete({
             </span>
           </button>
 
-          {/* Regla 3: Límite Numérico */}
+          {/* Regla 3: Input de Límite Máximo de Selección */}
+          {/* Utiliza onBlur para mitigar escrituras a medio terminar y optimizar peticiones de red */}
           <div className="flex items-center justify-center gap-2.5 bg-[#061115] border border-white/5 h-10 px-4 rounded-sm text-[11px] font-bold tracking-wider uppercase text-gray-400 w-full sm:w-auto focus-within:border-white/10 transition-colors">
             <span>Límite:</span>
             <input
@@ -126,7 +145,7 @@ export default function ControlesCarrete({
               min="1"
               disabled={guardandoAjustes}
               defaultValue={limiteSelecciones}
-              key={limiteSelecciones}
+              key={limiteSelecciones} // Fuerza la resincronización si la propiedad externa cambia
               onBlur={(e) => {
                 const valorEntero = parseInt(e.target.value, 10);
                 if (!isNaN(valorEntero) && valorEntero !== limiteSelecciones) {
@@ -139,7 +158,8 @@ export default function ControlesCarrete({
           </div>
         </div>
 
-        {/* BLOQUE DERECHO: DISPARADOR PRINCIPAL (5 Columnas en Desktop) */}
+        {/* BLOQUE DERECHO: ACCIÓN PRINCIPAL DE TRABAJO (5 Columnas en escritorios) */}
+        {/* Renderiza condicionalmente el disparador para exportar nombres a herramientas de revelado */}
         <div className="lg:col-span-5 xl:col-span-4 flex items-center justify-end w-full">
           {tieneElegidas ? (
             <button

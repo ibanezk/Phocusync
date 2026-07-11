@@ -1,4 +1,3 @@
-// 📁 Tu nuevo src/views/PanelGalerias.jsx (Ultra limpio)
 import { useGalerias } from "../hooks/useGalerias";
 import { GaleriaCard } from "../components/Galeria/GaleriaCard";
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,7 +8,7 @@ export default function PanelGalerias() {
   const navigate = useNavigate();
 
   return (
-    // 🎯 Reemplazamos el layout viejo por este div que se inyecta directo en el <Outlet />
+    // Reemplazamos el layout viejo por este div que se inyecta directo en el <Outlet />
     <div className="p-6 sm:p-10 space-y-8 max-w-[1600px] mx-auto">
       {/* Cabecera del Panel */}
       <div className="border-b border-white/5 pb-6 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
