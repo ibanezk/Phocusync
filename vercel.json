@@ -3,7 +3,7 @@
   "outputDirectory": ".",
   "rewrites": [
     {
-      "source": "/login",
+      "source": "/(.*)",
       "destination": "/app/dist/index.html"
     }
   ]
