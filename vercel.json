@@ -2,6 +2,10 @@
   "outputDirectory": ".",
   "rewrites": [
     {
+      "source": "/ingresar",
+      "destination": "/app/dist/index.html"
+    },
+    {
       "source": "/login",
       "destination": "/app/dist/index.html"
     },
