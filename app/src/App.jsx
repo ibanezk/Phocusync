@@ -13,7 +13,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import DashboardLayout from "./components/Dashboard/DashboardLayout";
 
 // Vistas de la Aplicación
-import Login from "./views/Login";
+import Login from "./views/login";
 import Dashboard from "./views/Dashboard";
 import DetalleProyecto from "./views/DetalleProyecto";
 import GaleriaCliente from "./views/GaleriaCliente";
