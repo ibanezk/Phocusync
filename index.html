@@ -207,12 +207,23 @@
                 </p>
 
                 <div id="heroButton">
-                  <button
-                    class="group w-14 h-14 md:w-16 md:h-16 rounded-full border border-brand-orange/70 bg-transparent flex items-center justify-center mx-auto md:mx-0 hover:border-brand-orange hover:bg-brand-orange/5 transition-all duration-300">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-brand-orange ml-0.5" viewBox="0 0 24 24" fill="none">
-                      <polygon points="5 3 19 12 5 21 5 3" fill="#FF4D00" />
-                    </svg>
-                  </button>
+                  <a
+                    href="/demo"
+                    class="group flex items-center gap-4 justify-center md:justify-start w-fit mx-auto md:mx-0">
+                    <!-- Círculo del botón Play -->
+                    <div
+                      class="w-14 h-14 md:w-16 md:h-16 rounded-full border border-brand-orange/70 bg-transparent flex items-center justify-center transition-all duration-300 group-hover:border-brand-orange group-hover:bg-brand-orange/5 group-hover:scale-105">
+                      <svg class="w-5 h-5 md:w-6 md:h-6 text-brand-orange ml-0.5" viewBox="0 0 24 24" fill="none">
+                        <polygon points="5 3 19 12 5 21 5 3" fill="#FF4D00" />
+                      </svg>
+                    </div>
+
+                    <!-- Texto descriptivo -->
+                    <span
+                      class="text-white font-semibold text-base md:text-lg tracking-wide transition-colors duration-300 group-hover:text-brand-orange">
+                      Prueba la Demo
+                    </span>
+                  </a>
                 </div>
               </div>
             </div>

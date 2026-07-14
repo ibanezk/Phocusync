@@ -19,6 +19,7 @@ import DetalleProyecto from "./views/DetalleProyecto";
 import GaleriaCliente from "./views/GaleriaCliente";
 import PanelGalerias from "./views/PanelGalerias";
 import Ajustes from "./views/Ajustes";
+import Ajustes from "./components/Demo";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         {/* Ahora coincide perfectamente con la redirección de la landing */}
         <Route path="/login" element={<Login />} />
+        <Route path="/demo" element={<Demo />} />
 
         {/* ================= PRIVATE WORKSPACE (With Sidebar) ================= */}
         <Route path="/dashboard" element={<DashboardLayout />}>
