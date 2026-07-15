@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // Importa tu función de login o el hook que uses para iniciar sesión
-import { useAuth } from "../hooks/useAuthForm";
+import { useAuthForm } from "../hooks/useAuthForm";
 
 export default function Demo() {
   const navigate = useNavigate();
