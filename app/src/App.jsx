@@ -19,7 +19,7 @@ import DetalleProyecto from "./views/DetalleProyecto";
 import GaleriaCliente from "./views/GaleriaCliente";
 import PanelGalerias from "./views/PanelGalerias";
 import Ajustes from "./views/Ajustes";
-import Ajustes from "./components/Demo";
+import Demo from "./components/Demo";
 
 export default function App() {
   return (
