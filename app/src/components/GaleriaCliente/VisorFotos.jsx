@@ -8,7 +8,7 @@
 
 import React from "react";
 import MarcaAguaGrid from "./MarcaAguaGrid";
-
+import SecureImage from "../DetalleProyecto/SecureImage"; //
 export default function VisorFotos({
   fotoActual,
   currentIndex,
@@ -45,8 +45,9 @@ export default function VisorFotos({
         className="w-full h-full md:max-w-[85%] flex items-center justify-center relative z-10">
         {/* RENDERIZADO DE IMAGEN POR HARDWARE */}
         {/* 'pointer-events-none' evita el arrastre fantasma del archivo binario */}
-        <img
-          src={fotoActual?.url}
+        {/* Usamos SecureImage para solicitar de forma segura la URL firmada a Supabase */}
+        <SecureImage
+          fotoUrl={fotoActual?.url}
           alt="Fotografía de la sesión"
           className="w-full md:w-auto max-w-full max-h-full object-contain shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 dynamic-image pointer-events-none select-none relative z-10"
         />

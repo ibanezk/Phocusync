@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import SecureImage from "./SecureImage";
 
 export default function FotoGrid({
   fotosMostradas,
@@ -42,20 +43,8 @@ export default function FotoGrid({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                 className={`group aspect-[2/3] bg-[#09171d] border relative overflow-hidden flex flex-col justify-between transition-all duration-200 ${isSelected ? "border-[#ff4d00]" : "border-white/5 hover:border-white/20"}`}>
-                {/* ELEMENTO MULTIMEDIA: Carga diferida (lazy) para optimizar el rendimiento de la red */}
-                <img
-                  src={foto.url}
-                  alt={foto.nombre_archivo}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    // Control de excepciones para enlaces caídos o fallos del Storage
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop";
-                    e.target.style.opacity = "0.2";
-                  }}
-                />
+                {/* ELEMENTO MULTIMEDIA: Carga segura y diferida (lazy) para optimizar el rendimiento de la red y proteger el bucket */}
+                <SecureImage fotoUrl={foto.url} alt={foto.nombre_archivo} className="w-full h-full object-cover" />
 
                 <div
                   className="absolute top-2 right-2 bg-[#061115]/80 backdrop-blur-xs border border-white/10 text-gray-300 text-[10px] font-mono px-2 py-0.5 rounded-xs max-w-[140px] truncate shadow-md pointer-events-auto selection:bg-transparent"
