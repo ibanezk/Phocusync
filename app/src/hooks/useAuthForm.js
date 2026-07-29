@@ -1,30 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 
 export function useAuthForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get("plan");
 
   // =========================================================================
   // 1. ESTADOS LOCALES (Reactive State Management)
   // =========================================================================
-  const [authMode, setAuthMode] = useState("login"); // Determina el flujo: "login" o "register"
-  const [email, setEmail] = useState(""); // Almacena el correo electrónico
-  const [password, setPassword] = useState(""); // Almacena la contraseña cifrada en tránsito
-  const [fullName, setFullName] = useState(""); // Nombre del fotógrafo (exclusivo para registro)
-  const [loading, setLoading] = useState(false); // Flag de control para bloquear interacciones durante peticiones de red
+  const [authMode, setAuthMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Estado reactivo para el manejo de alertas personalizadas e inyección de UI en el Toast
   const [notificacion, setNotificacion] = useState({
     mostrar: false,
     mensaje: "",
     tipo: "success",
   });
 
-  /**
-   * Helper interno para disparar el estado de la notificación flotante
-   * y gestionar su ciclo de vida de auto-ocultado.
-   */
   const lanzarNotificacion = (mensaje, tipo = "success") => {
     setNotificacion({ mostrar: true, mensaje, tipo });
     setTimeout(() => {
@@ -33,99 +30,130 @@ export function useAuthForm() {
   };
 
   // =========================================================================
+  // HELPER: REDIRECCIÓN A STRIPE (Servicio Serverless API)
+  // =========================================================================
+  const procesarPagoStripe = async (user) => {
+    try {
+      lanzarNotificacion("Redirigiendo a la pasarela de pago...", "success");
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceId: plan,
+          userId: user.id,
+          userEmail: user.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        window.location.href = data.url; // Redirección exitosa a Stripe
+      } else {
+        lanzarNotificacion(`Error en el checkout: ${data.error || "No se pudo generar el pago"}`, "error");
+        setLoading(false);
+      }
+    } catch (error) {
+      lanzarNotificacion(`Error de red: ${error.message}`, "error");
+      setLoading(false);
+    }
+  };
+
+  // Auto-redirección si el usuario YA tenía la sesión iniciada en el navegador
+  useEffect(() => {
+    const verificarSesionExistente = async () => {
+      if (!plan) return;
+
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          setLoading(true);
+          await procesarPagoStripe(user);
+        }
+      } catch (err) {
+        console.error("Error verificando sesión:", err);
+        setLoading(false);
+      }
+    };
+
+    verificarSesionExistente();
+  }, [plan]);
+
+  // =========================================================================
   // 2. MANEJADORES DE INTERFAZ / EVENTOS (UI State Cleaners)
   // =========================================================================
-
-  /**
-   * Conmuta entre los modos de Inicio de Sesión y Registro.
-   * Optimización: Limpia los campos del formulario al cambiar de modo para evitar
-   * fugas de credenciales accidentales o efectos visuales extraños.
-   */
   const handleSwitchMode = () => {
     setAuthMode(authMode === "login" ? "register" : "login");
     setEmail("");
     setPassword("");
-    fullName && setFullName(""); // Limpieza segura de estados condicionales
+    if (fullName) setFullName("");
   };
 
   // =========================================================================
-  // 3. LOGICA CENTRAL ASÍNCRONA (Authentication Core & Pipeline)
+  // 3. LÓGICA CENTRAL ASÍNCRONA (Authentication Core & Pipeline)
   // =========================================================================
-
-  /**
-   * Orquesta el envío del formulario interceptando el comportamiento nativo del DOM.
-   * @param {Event} e - Objeto del evento submit del formulario nativo.
-   */
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Detiene el refresco de página clásico para mantener el estado de la SPA
+    e.preventDefault();
 
-    // ---------------------------------------------------------------------
-    // === FASE 0: VALIDACIÓN DE FORMATO CRÍTICO (Client-Side Guardrails) ===
-    // ---------------------------------------------------------------------
-    // Fuerza una estructura estricta que exija un TLD válido (ej: .com, .co, .net)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(email)) {
       lanzarNotificacion("Por favor, ingresa un correo electrónico válido (ejemplo: usuario@dominio.com).", "error");
-      return; // Interrupción inmediata del pipeline antes de activar estados de carga o llamados API
+      return;
     }
 
-    setLoading(true); // Bloquea botones para mitigar condiciones de carrera (Race Conditions)
+    setLoading(true);
 
     if (authMode === "register") {
-      // ---------------------------------------------------------------------
-      // === FASE A.1: REGISTRO EN EL PROVEEDOR DE AUTH (Supabase Identity) ===
-      // ---------------------------------------------------------------------
+      // --- MODO REGISTRO ---
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email,
         password: password,
       });
 
-      // Guardrail / Manejo estricto de errores de comunicación con el Identity Provider
       if (authError) {
         lanzarNotificacion(`Error al registrar cuenta: ${authError.message}`, "error");
         setLoading(false);
-        return; // Interrupción inmediata del pipeline si la autenticación falla
+        return;
       }
 
-      // ---------------------------------------------------------------------
-      // === FASE A.2: PERSISTENCIA EN CASCADA (Public Profile Table) ===
-      // ---------------------------------------------------------------------
-      // Si el usuario se creó correctamente en GoTrue (Auth), sincronizamos sus metadatos
-      // dentro de la base de datos relacional PostgreSQL para el uso funcional de la app.
       if (authData?.user) {
         const { error: dbError } = await supabase.from("fotografos").insert([
           {
-            id: authData.user.id, // Llave foránea (FK) vinculada directamente al ID único de la autenticación
+            id: authData.user.id,
             nombre_completo: fullName,
             email: email,
           },
         ]);
 
         if (dbError) {
-          // El usuario existe en Auth pero falló la inserción en la tabla de negocio.
-          // Alerta al administrador/usuario para diagnóstico sin romper el flujo del front.
           lanzarNotificacion(`Cuenta creada, pero hubo un error en el perfil: ${dbError.message}`, "error");
+          setLoading(false);
         } else {
-          // Éxito absoluto: Perfil e identidad sincronizados correctamente.
-          lanzarNotificacion("¡Perfil creado con éxito! ", "success");
-          setAuthMode("login"); // Redirección interna hacia el formulario de acceso
+          // Si venía con un plan seleccionado y la sesión fue creada automáticamente:
+          if (plan && authData.session) {
+            await procesarPagoStripe(authData.user);
+          } else {
+            lanzarNotificacion("¡Perfil creado con éxito!", "success");
+            setAuthMode("login");
+            setLoading(false);
+          }
         }
       }
     } else {
-      // ---------------------------------------------------------------------
-      // === FASE B: PROCESO DE INICIO DE SESIÓN (Sign In Session Management) ===
-      // ---------------------------------------------------------------------
-      const { error } = await supabase.auth.signInWithPassword({
+      // --- MODO LOGIN ---
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
 
       if (error) {
-        // 1. Por defecto dejamos el mensaje original por si sale un error raro
         let mensajeError = error.message;
 
-        // 2. Filtramos los errores típicos
         if (error.message.includes("Invalid login credentials")) {
           mensajeError = "El correo o la contraseña no coinciden.";
         } else if (error.message.includes("Email not confirmed")) {
@@ -134,19 +162,20 @@ export function useAuthForm() {
           mensajeError = "Demasiados intentos. Por favor, intenta de nuevo en unos minutos.";
         }
 
-        // 3. Lanzamos la notificación
         lanzarNotificacion(`Error al ingresar: ${mensajeError}`, "error");
+        setLoading(false);
       } else {
-        // Establecimiento correcto de sesión de JWT. Redirección al área privada.
-        navigate("/dashboard");
+        // Redirección condicional: Stripe si hay plan en la URL, Dashboard si no.
+        if (plan && signInData?.user) {
+          await procesarPagoStripe(signInData.user);
+        } else {
+          navigate("/dashboard");
+          setLoading(false);
+        }
       }
     }
-
-    // FASE DE LIBERACIÓN: Desbloquea la interfaz sin importar el resultado de la transacción
-    setLoading(false);
   };
 
-  // API pública expuesta por el Hook para consumo del componente presentacional Login.jsx
   return {
     authMode,
     email,
@@ -156,8 +185,8 @@ export function useAuthForm() {
     fullName,
     setFullName,
     loading,
-    notificacion, // Expuesto para renderizado condicional del Toast en la vista
-    setNotificacion, // Expuesto para permitir el cierre manual desde la UI
+    notificacion,
+    setNotificacion,
     handleSwitchMode,
     handleSubmit,
   };
