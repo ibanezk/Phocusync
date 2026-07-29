@@ -6,7 +6,7 @@ export default defineConfig(({ command }) => {
     plugins: [react()],
     // Si estás en local ejecutando el servidor, usa '/'
     // Si estás compilando para producción (Vercel), usa '/app/dist/'
-    base: command === "serve" ? "/" : "/app/dist/",
+    base: command === "serve" ? "/" : "/",
 
     server: {
       port: 3003,
