@@ -1,26 +1,18 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "app/dist"
-      }
+  "functions": {
+    "app/api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/api/(.*)",
+      "destination": "/app/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/app/dist/$1"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
