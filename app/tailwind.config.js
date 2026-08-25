@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Aquí le decimos que busque en tu HTML
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      // Definimos tus fuentes Premium
+      colors: {
+        "brand-orange": "#FF4D00",
+      },
       fontFamily: {
-        serif: ["Cormorant Garamond", "serif"],
-        sans: ["Inter", "sans-serif"],
-        molengo: ['"Molengo"', "sans-serif"],
+        molengo: ["Molengo", "sans-serif"],
       },
     },
   },

@@ -11,10 +11,10 @@ import { supabase } from "../lib/supabaseClient";
 
 export default function useAlmacenamiento() {
   // --- ESTADOS DE CONSUMO Y PLAN ---
-  const [almacenamientoUsado, setAlmacenamientoUsado] = useState(0); // Espacio consumido acumulado (en Gigabytes)
-  const [almacenamientoMaximo, setAlmacenamientoMaximo] = useState(1.0); // Límite del plan asignado (en Gigabytes)
-  const [planActual, setPlanActual] = useState("Standard"); // Etiqueta comercial del plan activo
-  const [cargando, setCargando] = useState(true); // Bloqueo de UI mientras se resuelven las consultas
+  const [almacenamientoUsado, setAlmacenamientoUsado] = useState(0); // Espacio consumido en GB
+  const [almacenamientoMaximo, setAlmacenamientoMaximo] = useState(1.0); // Límite del plan en GB
+  const [planActual, setPlanActual] = useState("Standard"); // Nombre del plan activo
+  const [cargando, setCargando] = useState(true); // Estado de carga para la interfaz
 
   useEffect(() => {
     async function obtenerDatosAlmacenamiento() {
@@ -27,34 +27,35 @@ export default function useAlmacenamiento() {
         } = await supabase.auth.getUser();
         if (!user) return;
 
-        // 2. CONSULTA DEL PLAN COMERCIAL
-        // Busca el perfil del fotógrafo para identificar su nivel de suscripción
+        // 2. CONSULTA DEL PLAN COMERCIAL Y LÍMITE DE ALMACENAMIENTO (Única consulta)
         const { data: fotografo, error: errorFotografo } = await supabase
           .from("fotografos")
-          .select("plan")
+          .select("plan, storage_limit")
           .eq("id", user.id)
-          .maybeSingle(); // Evita lanzar excepciones si no se encuentra una fila exacta
+          .maybeSingle();
 
         if (errorFotografo) {
           console.error("Error al traer el plan de fotografos:", errorFotografo);
         }
 
-        // Diccionario estricto de configuración de cuotas del SaaS
-        const configPlanes = {
-          standard: { nombre: "Standard", max: 1.0 },
-          pro_studio: { nombre: "Pro Studio", max: 50.0 },
-          agency: { nombre: "Agency", max: 50.0 },
+        const nombresPlanes = {
+          standard: "Standard",
+          pro: "Pro Studio",
+          pro_studio: "Pro Studio",
+          agency: "Agency",
         };
 
-        // Normalización de la cadena de texto para prevenir fallos por mayúsculas/minúsculas
         const planKey = fotografo?.plan?.toLowerCase() || "standard";
-        const config = configPlanes[planKey] || configPlanes.standard;
+        const nombrePlan = nombresPlanes[planKey] || "Standard";
 
-        setPlanActual(config.nombre);
-        setAlmacenamientoMaximo(config.max);
+        // Conversión de Bytes de la BD a GB (1 GB = 1024^3 bytes)
+        const bytesEnUnGB = 1024 * 1024 * 1024;
+        const limiteEnGB = fotografo?.storage_limit ? fotografo.storage_limit / bytesEnUnGB : 1.0;
+
+        setPlanActual(nombrePlan);
+        setAlmacenamientoMaximo(limiteEnGB);
 
         // 3. RECUPERACIÓN DE PROYECTOS ASOCIADOS
-        // Extrae los IDs de todos los proyectos creados por este fotógrafo
         const { data: proyectos, error: errorProyectos } = await supabase
           .from("proyectos")
           .select("id")
@@ -62,7 +63,7 @@ export default function useAlmacenamiento() {
 
         if (errorProyectos) throw errorProyectos;
 
-        // Si el usuario no tiene proyectos, su consumo es automáticamente cero
+        // Si el usuario no tiene proyectos, su consumo es 0
         if (!proyectos || proyectos.length === 0) {
           setAlmacenamientoUsado(0);
           return;
@@ -70,8 +71,7 @@ export default function useAlmacenamiento() {
 
         const proyectosIds = proyectos.map((p) => p.id);
 
-        // 4. CÁLCULO MÁSICO DE TAMAÑO DE IMÁGENES
-        // Consulta los bytes de todas las fotos vinculadas a la lista de proyectos mediante el operador IN
+        // 4. CÁLCULO DE TAMAÑO DE IMÁGENES
         const { data: fotos, error: errorFotos } = await supabase
           .from("fotos")
           .select("size")
@@ -79,11 +79,11 @@ export default function useAlmacenamiento() {
 
         if (errorFotos) throw errorFotos;
 
-        // Sumatoria de bytes y conversión matemática a Gigabytes
+        // Sumatoria de bytes y conversión a Gigabytes
         if (fotos && fotos.length > 0) {
           const totalBytes = fotos.reduce((acc, foto) => acc + (foto.size || 0), 0);
-          const totalGB = totalBytes / 1024 ** 3; // Conversión directa a base 1024 (Bytes -> KB -> MB -> GB)
-          setAlmacenamientoUsado(Number(totalGB.toFixed(2))); // Redondeo a dos decimales flotantes
+          const totalGB = totalBytes / bytesEnUnGB;
+          setAlmacenamientoUsado(totalGB); // Guardamos el valor exacto en GB
         } else {
           setAlmacenamientoUsado(0);
         }
@@ -97,6 +97,5 @@ export default function useAlmacenamiento() {
     obtenerDatosAlmacenamiento();
   }, []);
 
-  // Exposición de métricas listas para componentes de analíticas o barras de progreso
   return { almacenamientoUsado, almacenamientoMaximo, planActual, cargando };
 }

@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
+import useAlmacenamiento from "./useAlmacenamiento";
 
 export default function useDetalleProyecto(id, navigate) {
   // -------------------------------------------------------------------------
@@ -19,6 +20,7 @@ export default function useDetalleProyecto(id, navigate) {
   const [uploading, setUploading] = useState(false); // Flag para animaciones de carga durante subidas o borrados masivos
   const [isDragActive, setIsDragActive] = useState(false); // UI toggle para el efecto de arrastre (Drag & Drop)
   const [selectedFotos, setSelectedFotos] = useState([]); // Array de IDs elegidos para operaciones masivas (ej. borrar)
+  const { almacenamientoUsado, almacenamientoMaximo } = useAlmacenamiento();
 
   // -------------------------------------------------------------------------
   // 2. ESTADOS DE CONTROL DE MODALES (UI Dialogs State)
@@ -28,6 +30,12 @@ export default function useDetalleProyecto(id, navigate) {
   const [modalEliminar, setModalEliminar] = useState({ isOpen: false, fotoId: null, fotoUrl: null });
   const [modalEliminarMasivo, setModalEliminarMasivo] = useState({ isOpen: false });
   const [modalComentario, setModalComentario] = useState({ isOpen: false, text: "", fotoUrl: "" });
+  const [modalAlmacenamiento, setModalAlmacenamiento] = useState({
+    isOpen: false,
+    disponibleMB: 0,
+    requeridoMB: 0,
+  });
+  const [modalPlanes, setModalPlanes] = useState({ isOpen: false });
 
   // -------------------------------------------------------------------------
   // 3. FILTRADO Y PAGINACIÓN POR DEMANDA (Performance & Pagination)
@@ -204,6 +212,26 @@ export default function useDetalleProyecto(id, navigate) {
   // Procesa secuencialmente una lista de archivos, limpia sus nombres y los aloja en Storage y Database
   const procesarYSubirArchivos = async (listaArchivos) => {
     if (!listaArchivos || listaArchivos.length === 0) return;
+    const bytesEnUnGB = 1024 * 1024 * 1024;
+    const usadoBytes = almacenamientoUsado * bytesEnUnGB;
+    const maximoBytes = almacenamientoMaximo * bytesEnUnGB;
+
+    // Calculamos cuánto pesan las nuevas fotos que se intentan subir
+    const pesoNuevosArchivosBytes = Array.from(listaArchivos).reduce((acc, file) => acc + file.size, 0);
+
+    // Bloqueo si excede el límite
+    if (usadoBytes + pesoNuevosArchivosBytes > maximoBytes) {
+      const disponible = Math.max(0, (maximoBytes - usadoBytes) / (1024 * 1024));
+      const requerido = pesoNuevosArchivosBytes / (1024 * 1024);
+
+      setModalAlmacenamiento({
+        isOpen: true,
+        disponibleMB: disponible.toFixed(1),
+        requeridoMB: requerido.toFixed(1),
+      });
+      return; // Detiene la subida
+    }
+
     setUploading(true);
 
     for (let file of listaArchivos) {
@@ -425,6 +453,8 @@ export default function useDetalleProyecto(id, navigate) {
       urlPublica,
       fotosFiltradas,
       fotosMostradas,
+      modalAlmacenamiento,
+      modalPlanes,
     },
     actions: {
       setModalEliminarProyecto,
@@ -434,6 +464,8 @@ export default function useDetalleProyecto(id, navigate) {
       setModalCompartir,
       setFiltroElegidas,
       setSelectedFotos,
+      setModalAlmacenamiento,
+      setModalPlanes,
       procesarYSubirArchivos,
       ejecutarEliminarFoto,
       abrirConfirmacionMasiva,

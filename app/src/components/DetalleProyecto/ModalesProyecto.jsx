@@ -7,6 +7,8 @@
 /* ========================================================================= */
 
 import { motion, AnimatePresence } from "framer-motion";
+import ModalAlmacenamiento from "./LimiteAlmacenamiento";
+import ModalPlanes from "../Ajustes/ModalPlanes";
 
 export default function ModalesProyecto({
   modalEliminar,
@@ -27,6 +29,10 @@ export default function ModalesProyecto({
   urlPublica,
   enlaceCopiado,
   handleCopiarEnlaceCompartir,
+  modalAlmacenamiento,
+  setModalAlmacenamiento,
+  modalPlanes,
+  setModalPlanes,
 }) {
   return (
     // AnimatePresence habilita la detección de desmontaje en el DOM para ejecutar los efectos 'exit'
@@ -35,6 +41,7 @@ export default function ModalesProyecto({
       {/* Controla la destrucción de un único recurso multimedia en el Storage/BD */}
       {modalEliminar.isOpen && (
         <motion.div
+          key="modal-eliminar"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,6 +72,7 @@ export default function ModalesProyecto({
       {/* Advierte al fotógrafo la cantidad exacta de archivos indexados en el array de selección masiva */}
       {modalEliminarMasivo.isOpen && (
         <motion.div
+          key="modal-eliminar-masivo"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -97,6 +105,7 @@ export default function ModalesProyecto({
       {/* CORRECCIÓN ARQUITECTÓNICA: Evalúa la propiedad '.isOpen' del estado estructurado */}
       {modalEliminarProyecto.isOpen && (
         <motion.div
+          key="modal-eliminar-proyecto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -128,6 +137,7 @@ export default function ModalesProyecto({
       {/* Caja de lectura para comentarios extensos del cliente con soporte para saltos de línea (whitespace-pre-wrap) */}
       {modalComentario.isOpen && (
         <motion.div
+          key="modal-comentario"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -158,6 +168,7 @@ export default function ModalesProyecto({
       {/* ─── MODAL 5: PANEL DE COMPARTICIÓN COMERCIAL ─── */}
       {modalCompartir.isOpen && (
         <motion.div
+          key="modal-compartir"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -192,6 +203,16 @@ export default function ModalesProyecto({
           </motion.div>
         </motion.div>
       )}
+
+      <ModalAlmacenamiento
+        key="modal-almacenamiento"
+        modalAlmacenamiento={modalAlmacenamiento}
+        setModalAlmacenamiento={setModalAlmacenamiento}
+        setModalPlanes={setModalPlanes}
+      />
+
+      {/* MODAL DE SELECCIÓN DE PLANES */}
+      <ModalPlanes key="modal-planes" isOpen={modalPlanes?.isOpen} onClose={() => setModalPlanes({ isOpen: false })} />
     </AnimatePresence>
   );
 }

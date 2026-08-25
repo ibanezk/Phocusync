@@ -31,20 +31,25 @@ export function useDescargarSeleccion() {
         const foto = fotosADescargar[i];
         setProgreso(`Comprimiendo foto ${i + 1} de ${fotosADescargar.length}...`);
 
+        // Reemplaza el bloque del try/catch dentro del bucle for por esto:
         try {
-          // Petición HTTP directa para transformar la URL remota de Storage en binario crudo
-          const respuesta = await fetch(foto.url);
-          if (!respuesta.ok) throw new Error("Error en la descarga del archivo");
+          // 1. Codificar la URL para evitar errores 400/406 por espacios o caracteres especiales
+          const urlValida = encodeURI(foto.url);
+
+          // 2. Petición HTTP con manejo explícito del status
+          const respuesta = await fetch(urlValida);
+          if (!respuesta.ok) {
+            throw new Error(`HTTP ${respuesta.status} - No se pudo obtener la imagen`);
+          }
 
           const blob = await respuesta.blob();
 
-          // Fallback de asignación semántica para el nombre del archivo dentro del contenedor comprimido
+          // Fallback de asignación semántica
           const nombreArchivo = foto.nombre_archivo || `foto_${i + 1}.jpg`;
 
-          // Inyección del búfer binario en el árbol virtual del ZIP
+          // Inyección en el ZIP
           zip.file(nombreArchivo, blob);
         } catch (err) {
-          // AISLAMIENTO DE ERRORES: Si una foto falla, el bucle continúa con las demás sin romper la descarga general
           console.error(`No se pudo agregar la foto ${foto.id} al ZIP:`, err);
         }
       }

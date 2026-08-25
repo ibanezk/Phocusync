@@ -57,7 +57,11 @@ export default function useGaleriaCliente() {
   useEffect(() => {
     const cargarGaleriaPublica = async () => {
       // 1. Obtención de metadatos del proyecto
-      const { data: dataProyecto, error: errProy } = await supabase.from("proyectos").select("*").eq("id", id).single();
+      const { data: dataProyecto, error: errProy } = await supabase
+        .from("proyectos")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
 
       if (errProy) {
         setLoading(false);
@@ -77,7 +81,7 @@ export default function useGaleriaCliente() {
           .from("perfiles")
           .select("nombre_estudio, instagram, marca_agua")
           .eq("id", dataProyecto.fotografo_id)
-          .single();
+          .maybeSingle();
 
         if (!errPerfil && dataPerfil) {
           setPerfilFotografo(dataPerfil);

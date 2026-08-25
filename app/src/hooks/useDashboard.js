@@ -55,20 +55,27 @@ export function useDashboard() {
       // ---------------------------------------------------------------------
       // PASO A: Resolución dinámica del Tier/Plan del usuario
       // ---------------------------------------------------------------------
-      const { data: fotografo } = await supabase.from("fotografos").select("plan").eq("id", user.id).maybeSingle();
+      const { data: fotografo } = await supabase
+        .from("fotografos")
+        .select("plan, storage_limit") // Traemos también el límite de almacenamiento
+        .eq("id", user.id)
+        .maybeSingle();
 
-      // Diccionario de configuración centralizado para escalabilidad de planes
-      const configPlanes = {
-        standard: { nombre: "Standard", max: 1.0 },
-        pro_studio: { nombre: "Pro Studio", max: 50.0 },
-        agency: { nombre: "Agency", max: 50.0 },
+      const nombresPlanes = {
+        standard: "Standard",
+        pro: "Pro Studio",
+        pro_studio: "Pro Studio",
+        agency: "Agency",
       };
 
       const planKey = fotografo?.plan?.toLowerCase() || "standard";
-      const config = configPlanes[planKey] || configPlanes.standard;
+      const nombrePlan = nombresPlanes[planKey] || "Standard";
 
-      setPlanActual(config.nombre);
-      setAlmacenamientoMaximo(config.max);
+      const bytesEnUnGB = 1024 * 1024 * 1024;
+      const limiteEnGB = fotografo?.storage_limit ? fotografo.storage_limit / bytesEnUnGB : 1.0;
+
+      setPlanActual(nombrePlan);
+      setAlmacenamientoMaximo(limiteEnGB);
 
       // ---------------------------------------------------------------------
       // PASO B: Consulta Relacional unificada (Eager Loading / Joins)
@@ -132,7 +139,7 @@ export function useDashboard() {
       setStats({
         proyectos: proyectosConContadores.length,
         fotos: acumuladoFotosGlobal,
-        almacenamiento: `${almacenamientoLegible} / ${config.max.toFixed(1)} GB`,
+        almacenamiento: `${almacenamientoLegible} / ${limiteEnGB.toFixed(1)} GB`,
       });
     } catch (err) {
       console.error("Error general en el Dashboard:", err.message);

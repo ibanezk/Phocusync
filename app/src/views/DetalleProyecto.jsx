@@ -108,6 +108,10 @@ export default function DetalleProyecto() {
         urlPublica={state.urlPublica}
         enlaceCopiado={state.enlaceCopiado}
         handleCopiarEnlaceCompartir={actions.handleCopiarEnlaceCompartir}
+        modalAlmacenamiento={state.modalAlmacenamiento}
+        setModalAlmacenamiento={actions.setModalAlmacenamiento}
+        modalPlanes={state.modalPlanes}
+        setModalPlanes={actions.setModalPlanes}
       />
     </div>
   );

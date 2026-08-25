@@ -7,7 +7,7 @@
 /* ========================================================================= */
 
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Layouts y Contenedores estructurales
 import DashboardLayout from "./components/Dashboard/DashboardLayout";
@@ -20,15 +20,19 @@ import GaleriaCliente from "./views/GaleriaCliente";
 import PanelGalerias from "./views/PanelGalerias";
 import Ajustes from "./views/Ajustes";
 import Demo from "./components/Demo";
+import CheckoutPage from "./components/Checkout";
+import PhocuSyncLanding from "./views/landing";
 
 export default function App() {
   return (
     <Router>
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
-        <Route path="/" element={<Navigate to="/login" />} />
-        {/* Ahora coincide perfectamente con la redirección de la landing */}
+        {/* 2. Asignas la Landing a la ruta raíz "/" */}
+        <Route path="/" element={<PhocuSyncLanding />} />
+
         <Route path="/login" element={<Login />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/demo" element={<Demo />} />
 
         {/* ================= PRIVATE WORKSPACE (With Sidebar) ================= */}

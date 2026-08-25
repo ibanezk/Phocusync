@@ -104,9 +104,11 @@ export default function ModalPlanes({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <button className="w-full bg-transparent hover:bg-[#ff4d00]/10 border border-[#ff4d00] text-[#ff4d00] text-[10px] tracking-widest uppercase font-bold py-3 transition-all rounded-sm">
+                <a
+                  href="/checkout?plan=price_1TwSmqLDjmkegSEknkJl1XYd"
+                  className="block text-center w-full mt-10 py-3.5 border border-[#FF4D00] text-[#FF4D00] text-xs tracking-widest uppercase transition-all duration-300 hover:bg-[#FF4D00] hover:text-white bg-transparent">
                   Obtener Pro Studio
-                </button>
+                </a>
               </div>
 
               {/* 3. PLAN AGENCY */}
@@ -139,9 +141,11 @@ export default function ModalPlanes({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <button className="w-full border border-white/10 hover:bg-white/5 text-white text-[10px] tracking-widest uppercase font-semibold py-3 transition-colors rounded-sm">
-                  Contactar Ventas
-                </button>
+                <a
+                  href="/checkout?plan=price_1TwT6xLDjmkegSEkzF0hMjk6"
+                  className="w-full mt-10 py-3.5 border border-gray-700 text-gray-300 text-xs tracking-widest uppercase transition-colors duration-300 hover:border-[#FF4D00] hover:text-[#FF4D00] bg-transparent flex items-center justify-center text-center">
+                  OBTENER AGENCY
+                </a>
               </div>
             </div>
           </motion.div>

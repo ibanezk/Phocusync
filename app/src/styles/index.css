@@ -1,0 +1,161 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Molengo&display=swap");
+
+/* ==========================================================================
+   1. CONFIGURACIÓN BASE Y TIPOGRAFÍA
+   ========================================================================== */
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* ==========================================================================
+   2. OPTIMIZACIONES DE RENDIMIENTO NATIVAS (ACELERACIÓN POR GPU)
+   ========================================================================== */
+.grid {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+main {
+  will-change: transform;
+}
+
+.bento-card {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.frame,
+.animate-on-load,
+#heroTitle,
+#imageContainer {
+  will-change: transform, opacity;
+}
+
+.animate-on-load {
+  opacity: 0;
+}
+
+.group {
+  will-change: transform;
+}
+
+img:not(.group img) {
+  content-visibility: auto;
+}
+
+/* ==========================================================================
+   3. CLASES Y UTILIDADES PERSONALIZADAS
+   ========================================================================== */
+
+#contactBtn {
+  white-space: nowrap !important;
+}
+
+/* Fondo base con textura de grano orgánico SVG + Gradiente lineal */
+.bg-hero-gradient {
+  background-color: rgba(2, 29, 48, 1);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+    linear-gradient(158deg, rgba(2, 29, 48, 1) 0%, rgba(0, 36, 19, 1) 50%, rgba(4, 36, 25, 1) 100%);
+  background-size: auto;
+  contain: paint;
+  transform: translateZ(0);
+}
+
+/* Transiciones optimizadas para tarjetas en hover */
+.group img,
+.group .absolute {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.group:hover .group-hover\:translate-y-0 {
+  transform: translateY(0);
+}
+
+.group .group-hover\:translate-y-4 {
+  transform: translateY(1rem);
+}
+
+/* ==========================================================================
+   4. ANIMACIONES Y SPINNER
+   ========================================================================== */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ==========================================================================
+   5. NAVEGACIÓN Y MENÚ DESPLEGABLE
+   ========================================================================== */
+#menuBtn {
+  transition: opacity 0.3s ease;
+  z-index: 30;
+}
+
+body.menu-open #menuBtn {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#closeMenuBtn {
+  z-index: 100;
+  position: absolute;
+  cursor: pointer;
+}
+
+/* --- MEDIA QUERIES DE NAVEGACIÓN --- */
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .desktop-nav > div:last-child,
+  .desktop-nav .flex.items-center {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 2rem !important;
+  }
+
+  .desktop-nav a {
+    display: inline-block !important;
+  }
+
+  .mobile-nav {
+    display: none !important;
+  }
+
+  .nav-item,
+  #contactBtn {
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: block !important;
+  }
+}

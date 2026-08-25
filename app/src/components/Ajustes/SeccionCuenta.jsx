@@ -11,10 +11,10 @@ import { motion } from "framer-motion";
 import useAlmacenamiento from "../../hooks/useAlmacenamiento";
 
 export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
-  // Hook personalizado que conecta con los metadatos de almacenamiento del fotógrafo
+  // Hook personalizado con datos directo de Supabase
   const { almacenamientoUsado, almacenamientoMaximo, planActual, cargando } = useAlmacenamiento();
 
-  // Diccionario centralizado de beneficios comerciales por nivel de suscripción
+  // Diccionario centralizado de beneficios por nivel de suscripción
   const infoContenidoPlanes = {
     Standard: {
       tagline: "Soporte básico para galerías activas simultáneas.",
@@ -30,12 +30,21 @@ export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
     },
   };
 
-  // Resguardo defensivo en caso de que el plan actual tarde en responder o no coincida
   const infoPlan = infoContenidoPlanes[planActual] || infoContenidoPlanes["Standard"];
 
-  // Regla matemática: Protege el diseño contra desbordes superiores al 100% o divisiones por cero
+  // Calcula el porcentaje exacto de consumo (protegido contra división por cero)
   const porcentaje =
     almacenamientoMaximo > 0 ? Math.min(Math.round((almacenamientoUsado / almacenamientoMaximo) * 100), 100) : 0;
+
+  // Formatea el espacio consumido a MB si es menor a 1 GB para mayor claridad visual
+  const formatearUso = (gb) => {
+    if (!gb || gb <= 0) return "0 MB";
+    const mb = gb * 1024;
+    if (mb < 1024) {
+      return `${mb.toFixed(1)} MB`;
+    }
+    return `${gb.toFixed(2)} GB`;
+  };
 
   return (
     <motion.div
@@ -43,14 +52,14 @@ export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -10 }}
       className="space-y-6 max-w-xl">
-      {/* TÍTULO Y DESCRIPCIÓN DE LA SUBSECCIONAL */}
+      {/* TÍTULO Y DESCRIPCIÓN */}
       <div>
         <h3 className="text-lg font-medium text-white">Cuenta & Almacenamiento</h3>
         <p className="text-xs text-gray-400 mt-0.5">Monitorea el consumo de espacio de tus archivos en PhocuSync.</p>
       </div>
 
       <div className="space-y-4 pt-2">
-        {/* CORREO VINCULADO (Persistente para dar contexto de sesión inmediato) */}
+        {/* CORREO VINCULADO */}
         <div className="p-4 bg-[#061115] border border-white/10 rounded-sm space-y-1">
           <p className="text-xs uppercase tracking-widest font-semibold text-gray-500">Correo Vinculado</p>
           <p className="text-sm font-mono text-white">{userEmail || "usuario@phocusync.com"}</p>
@@ -67,20 +76,19 @@ export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
                   Espacio en la Nube
                 </span>
                 <span className="font-mono text-white">
-                  {almacenamientoUsado.toFixed(2)} GB / {almacenamientoMaximo.toFixed(1)} GB
+                  {formatearUso(almacenamientoUsado)} / {almacenamientoMaximo.toFixed(1)} GB
                 </span>
               </div>
 
-              {/* Riel exterior de la barra de progreso */}
+              {/* Barra de progreso */}
               <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                {/* Barra interna reactiva con suavizado de transición por hardware CSS */}
                 <div
                   style={{ width: `${porcentaje}%` }}
                   className="h-full bg-[#ff4d00] rounded-full transition-all duration-500 ease-out"
                 />
               </div>
 
-              {/* Leyenda inteligente sobre el estado del almacenamiento */}
+              {/* Estado del almacenamiento */}
               <p className="text-xs text-gray-500">
                 {porcentaje === 0
                   ? `Estás utilizando menos del 1% de tu plan ${planActual}.`
@@ -90,7 +98,7 @@ export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
           )}
         </div>
 
-        {/* TARJETA DE ESTADO DEL PLAN ACTUAL Y ACCIONES UPGRADE */}
+        {/* TARJETA DE ESTADO DEL PLAN */}
         <div className="p-4 border border-white/5 rounded-sm flex items-center justify-between gap-4">
           {cargando ? (
             <p className="text-xs text-gray-400 font-mono animate-pulse">Cargando beneficios del plan...</p>
@@ -103,7 +111,6 @@ export default function SeccionCuenta({ userEmail, setModalPlanesAbierto }) {
                 <p className="text-xs text-gray-500 mt-1 max-w-sm">{infoPlan.tagline}</p>
               </div>
 
-              {/* Renderizado condicional: Oculta el botón si el usuario ya escaló al plan máximo */}
               {infoPlan.mostrarBotonMejorar && (
                 <button
                   onClick={() => setModalPlanesAbierto(true)}
