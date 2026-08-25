@@ -2,6 +2,15 @@ import React, { useRef } from "react";
 import { usePhocuSyncAnimations } from "../hooks/useLandingAnimaciones";
 import "../styles/index.css";
 
+// 1. Importación de las imágenes desde src/assets/
+import heroImg from "../assets/hero.webp";
+import seccion2_1Img from "../assets/seccion2_1.webp";
+import seccion2_2Img from "../assets/seccion2_2.webp";
+import seccion2_3Img from "../assets/seccion2_3.webp";
+import paso1Img from "../assets/paso1.png";
+import paso2Img from "../assets/paso2.png";
+import paso3Img from "../assets/paso3.png";
+
 export default function PhocuSyncLanding() {
   const containerRef = useRef(null);
 
@@ -183,7 +192,7 @@ export default function PhocuSyncLanding() {
 
                     <div className="w-full aspect-[4/5] overflow-hidden bg-gray-100 relative z-10" id="photo">
                       <img
-                        src="../assets/hero.webp"
+                        src={heroImg}
                         alt="Retrato elegante"
                         className="w-full h-full object-cover block shadow-2xl"
                         loading="lazy"
@@ -243,6 +252,7 @@ export default function PhocuSyncLanding() {
               <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#021C33] to-transparent z-20 pointer-events-none"></div>
 
               <div className="flex whitespace-nowrap will-change-transform" id="marqueeContent">
+                {/* Track 1 */}
                 <div className="marquee-track flex items-center gap-16 md:gap-24 text-white font-light text-sm md:text-lg tracking-widest opacity-40 pr-16 md:pr-24">
                   <span>LIGHTROOM</span> <span className="text-[#FF4D00]">•</span> <span>CAPTURE ONE</span>{" "}
                   <span className="text-[#FF4D00]">•</span> <span>PHOTOSHOP</span>{" "}
@@ -250,8 +260,9 @@ export default function PhocuSyncLanding() {
                   <span className="text-[#FF4D00]">•</span>
                 </div>
 
+                {/* Track 2 (Idéntico al Track 1) */}
                 <div
-                  className="marquee-track flex items-center gap-16 md:gap-24 text-white font-custom text-lg md:text-3xl tracking-widest opacity-40 pr-16 md:pr-24"
+                  className="marquee-track flex items-center gap-16 md:gap-24 text-white font-light text-sm md:text-lg tracking-widest opacity-40 pr-16 md:pr-24"
                   aria-hidden="true">
                   <span>LIGHTROOM</span> <span className="text-[#FF4D00]">•</span> <span>CAPTURE ONE</span>{" "}
                   <span className="text-[#FF4D00]">•</span> <span>PHOTOSHOP</span>{" "}
@@ -276,7 +287,7 @@ export default function PhocuSyncLanding() {
 
                   <div className="aspect-[482/571] relative overflow-hidden">
                     <img
-                      src="../assets/seccion2_1.webp"
+                      src={seccion2_1Img}
                       alt="Carga sin límites"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
                       loading="lazy"
@@ -310,7 +321,7 @@ export default function PhocuSyncLanding() {
                   </div>
                   <div className="aspect-[482/571] relative overflow-hidden">
                     <img
-                      src="../assets/seccion2_2.webp"
+                      src={seccion2_2Img}
                       alt="Control centralizado"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
                       loading="lazy"
@@ -342,7 +353,7 @@ export default function PhocuSyncLanding() {
                   </div>
                   <div className="aspect-[482/571] relative overflow-hidden">
                     <img
-                      src="../assets/seccion2_3.webp"
+                      src={seccion2_3Img}
                       alt="Feedback al instante"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
                       loading="lazy"
@@ -469,7 +480,7 @@ export default function PhocuSyncLanding() {
                   <div className="relative w-full h-full flex-grow bg-[#091317] overflow-hidden">
                     <div className="tab-img absolute inset-0 w-full h-full opacity-100 scale-100 pointer-events-auto">
                       <img
-                        src="../assets/paso1.png"
+                        src={paso1Img}
                         alt="Detalle de carga"
                         className="w-full h-full object-cover object-center"
                         loading="lazy"
@@ -478,7 +489,7 @@ export default function PhocuSyncLanding() {
                     </div>
                     <div className="tab-img absolute inset-0 w-full h-full opacity-0 scale-95 pointer-events-none">
                       <img
-                        src="../assets/paso2.png"
+                        src={paso2Img}
                         alt="Detalle feedback"
                         className="w-full h-full object-cover object-center"
                         loading="lazy"
@@ -487,7 +498,7 @@ export default function PhocuSyncLanding() {
                     </div>
                     <div className="tab-img absolute inset-0 w-full h-full opacity-0 scale-95 pointer-events-none">
                       <img
-                        src="../assets/paso3.png"
+                        src={paso3Img}
                         alt="Detalle aprobación"
                         className="w-full h-full object-cover object-center"
                         loading="lazy"
@@ -742,7 +753,7 @@ export default function PhocuSyncLanding() {
 
               <div className="relative z-10 max-w-2xl mx-auto">
                 <h2 className="font-extrabold text-3xl md:text-5xl uppercase tracking-wider mb-6 leading-tight text-white">
-                  ¿Listo para sincronizar tu flujo de trabajo?
+                  ¿Listo para synchronizar tu flujo de trabajo?
                 </h2>
 
                 <p className="text-sm md:text-base text-white font-sans mb-10 leading-relaxed max-w-lg mx-auto">
