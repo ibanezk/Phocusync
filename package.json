@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "concurrently \"tailwindcss -i styles.css -o output.css --watch\" \"lite-server\"",
     "postinstall": "cd app && npm install",
-    "build": "tailwindcss -i styles.css -o output.css && cd app && npm run build"
+    "build": "cd app && npm run build"
   },
   "dependencies": {
     "jszip": "^3.10.1",
